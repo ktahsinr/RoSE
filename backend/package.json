@@ -1,0 +1,17 @@
+{
+  "name": "rose-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "RoSE (Reasoning with Orchestrated Streaming Experiences) — local Ollama implementation",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "prepare-data": "node src/prepareData.js",
+    "ask": "node src/cli.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}

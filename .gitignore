@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Python virtual environment
+.venv/
+__pycache__/
+*.py[cod]
+
+# Build output
+dist/
+build/
+
+# Environment / secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
