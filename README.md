@@ -79,3 +79,27 @@ cd frontend && npm install && npm run dev
 - Only CommonsenseQA (1 of the paper's 9 benchmarks) is wired up. The data
   loader is structured so the other 8 (GSM8K, AQuA, AddSub, SingleEq, SingleOp,
   SVAMP, StrategyQA, Date) can be added as normalized JSON.
+
+  ## ChartQAPro Extension
+
+We extend RoSE from text-only (CommonsenseQA) to vision (chart images).
+
+| Dataset | Model | Questions | Method |
+|---------|-------|-----------|--------|
+| CommonsenseQA | llama3.1:8b (local) | 1,221 | Original RoSE |
+| ChartQAPro | Qwen2.5-VL-3B | 1,948 | RoSE-CQA (this work) |
+
+### Results on ChartQAPro
+
+| Question Type | Zero-shot | RoSE |
+|---|---|---|
+| Factoid | X% | Y% |
+| MCQ | X% | Y% |
+| Unanswerable | X% | Y% |
+| Overall | X% | Y% |
+
+[Full results](chartqapro/results/rose_cqa_results.json)
+
+### Run it
+
+See the [Colab notebook](chartqapro/RoSE_ChartQAPro_Colab.ipynb).
