@@ -114,7 +114,7 @@ select, input[type=text] {
 .tag.no { background: #2a1416; color: var(--bad); }
 
 .poolbar { display: flex; align-items: center; gap: 10px; margin: 16px 0; font-size: 13px; flex-wrap: wrap; }
-button.ghost { background: var(--panel2); border: 1px solid var(--border); color: var(--text); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; }
+button.ghost, .ghost { background: var(--panel2); border: 1px solid var(--border); color: var(--text); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; }
 button.primary { background: var(--rose); color: white; border: none; padding: 10px 18px; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 600; }
 button.primary.big { width: 100%; padding: 14px; font-size: 16px; margin-top: 8px; }
 button:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -193,5 +193,106 @@ th { color: var(--muted); font-weight: 600; }
 .paper2 .roserow td { color: var(--text); font-weight: 600; }
 .paper2 .roserow td:first-child { color: var(--rose); }
 .paper2 .bestcell { color: var(--rose); font-weight: 700; }
+
+/* ------------------------------------------------------------------ */
+/* ChartQAPro (vision extension)                                       */
+/* ------------------------------------------------------------------ */
+
+.tabnote {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px;
+  opacity: 0.7; margin-left: 5px;
+}
+
+.runbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
+.runbar select { flex: 1; min-width: 240px; width: auto; }
+button.ghost.danger, .ghost.danger { color: #fca5a5; border-color: #5b2027; }
+.btnlink { text-decoration: none; display: inline-block; }
+
+.steps { margin: 8px 0 0; padding-left: 20px; font-size: 14px; color: var(--muted); }
+.steps li { margin-bottom: 6px; }
+.steps code { color: #ffd0a8; }
+
+/* headline number */
+.heroRow { display: flex; align-items: center; gap: 26px; flex-wrap: wrap; margin-bottom: 6px; }
+.hero { display: flex; flex-direction: column; }
+.heroval { font-size: 52px; font-weight: 700; line-height: 1; color: var(--rose); font-variant-numeric: tabular-nums; }
+.herolabel { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.metric.wide { min-width: 150px; }
+.metric.wide .mlabel, .metric.wide .muted { display: block; }
+.metric.wide .muted { margin-top: 3px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 4px; }
+.chip {
+  background: var(--panel2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 5px 10px; font-size: 12px; color: var(--text);
+}
+.chip b { color: var(--muted); font-weight: 600; margin-right: 6px; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; }
+
+/* extension switches */
+.extgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 10px; margin-top: 12px; }
+.extrow { display: flex; gap: 10px; align-items: flex-start; background: var(--panel2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+.extrow b { font-size: 13px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.extrow p { margin: 4px 0 0; }
+.extstate {
+  flex-shrink: 0; font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+  padding: 3px 7px; border-radius: 6px; margin-top: 2px; min-width: 34px; text-align: center;
+}
+.extrow.on { border-color: #4c1d2b; }
+.extrow.on .extstate { background: var(--rose-soft); color: #f3a8ba; }
+.extrow.off .extstate { background: #0d0f15; color: var(--muted); }
+.extrow.unknown .extstate { background: #2a2110; color: var(--warn); }
+.extrow.off b, .extrow.unknown b { color: var(--muted); }
+
+/* learning curve */
+.chart { position: relative; margin: 10px 0 4px; }
+svg.curve { width: 100%; height: auto; display: block; overflow: visible; }
+.gridline { stroke: var(--border); stroke-width: 1; }
+.axistext { fill: var(--muted); font-size: 11px; }
+.endlabel { font-size: 12px; font-weight: 600; }
+.markerline { stroke: var(--warn); stroke-width: 1.5; stroke-dasharray: 4 4; opacity: 0.7; }
+.crosshair { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3; }
+
+.tooltip {
+  position: absolute; top: 12px; pointer-events: none;
+  background: #0b0d12; border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 12px; font-size: 12px; display: flex; flex-direction: column; gap: 2px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); white-space: nowrap; z-index: 5;
+}
+.tooltip .ok { color: var(--good); } .tooltip .no { color: var(--bad); }
+
+.legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-top: 8px; }
+.legend span { display: flex; align-items: center; gap: 7px; }
+.legend i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+
+/* browser */
+.filters { display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 6px; }
+.filters label { display: flex; flex-direction: column; gap: 5px; font-size: 12px; color: var(--muted); }
+.filters select, .filters input { min-width: 150px; }
+.filters .grow { flex: 1; min-width: 200px; }
+
+.rowtable { font-variant-numeric: tabular-nums; }
+.rowtable tr.clickable { cursor: pointer; }
+.rowtable tr.clickable:hover td { background: var(--panel2); }
+.rowtable tr.openrow td { background: var(--panel2); }
+.detailrow > td { background: #0d0f15; padding: 16px; }
+.detail .metrics { margin: 12px 0; }
+.detail .metric { min-width: 90px; }
+.detail .mval { font-size: 14px; word-break: break-word; }
+.paths details { border-top: 1px solid var(--border); }
+.paths summary .tag { margin-left: 8px; }
+
+/* ChartQAPro bars carry their value outside the fill when the bar is too
+   short to hold it; the shared dashboard bars keep their original geometry. */
+.bars.compact .bartrack { display: flex; align-items: center; }
+.bars.compact .barfill { min-width: 0; flex-shrink: 0; }
+.barval.outside { color: var(--muted); font-weight: 700; font-size: 13px; margin-left: 8px; white-space: nowrap; }
+
+.log tr.bestrow td { background: var(--rose-soft); color: var(--text); font-weight: 600; }
+.log tr.bestrow td:first-child { box-shadow: inset 2px 0 0 var(--rose); }
+
+.pager { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.subhead { font-size: 12px; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); margin: 16px 0 4px; }
+.grid2.tight { gap: 24px; grid-template-columns: 1fr 1fr; }
+@media (max-width: 900px) { .grid2.tight { grid-template-columns: 1fr; } }
 
 footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); text-align: center; }

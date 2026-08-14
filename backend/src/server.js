@@ -7,13 +7,21 @@ import { fileURLToPath } from 'node:url';
 import { health } from './ollama.js';
 import { ExperiencePool, answerWithRoSE } from './rose.js';
 import { zeroShotCoT, autoCoT } from './baselines.js';
+import * as chartqapro from './chartqapro.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(__dirname, '..', 'data');
 
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: '1mb' }));
+// ChartQAPro uploads are whole result files (tens of MB of generations) and
+// bring their own parser, so they must skip this 1mb one — otherwise a run
+// posted as application/json is rejected before that route is reached.
+app.use((req, res, next) =>
+  req.path === '/api/chartqapro/upload'
+    ? next()
+    : express.json({ limit: '1mb' })(req, res, next)
+);
 
 // ------------------------------ datasets ---------------------------------
 
@@ -72,6 +80,9 @@ app.get('/api/health', async (req, res) => {
     datasets: Object.fromEntries(
       Object.entries(DATASETS).map(([k, d]) => [k, d.test.length])
     ),
+    // The vision extension is offline (GPU elsewhere) — the UI only reads
+    // whatever result files have landed in chartqapro/results/.
+    chartqapro: chartqapro.info(),
   });
 });
 
@@ -241,10 +252,18 @@ app.post('/api/benchmark', async (req, res) => {
   }
 });
 
+// -------------------------- ChartQAPro (vision) --------------------------
+
+// Read-only views over finished ChartQAPro runs, plus upload/export. All the
+// scoring happens in Python — see backend/src/chartqapro.js.
+chartqapro.register(app, express);
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`RoSE backend on http://localhost:${PORT}`);
   for (const [k, d] of Object.entries(DATASETS)) {
     console.log(`  ${k}: ${d.test.length} test${d.train.length ? `, ${d.train.length} train` : ''}`);
   }
+  const cqa = chartqapro.info();
+  console.log(`  ChartQAPro: ${cqa.runs} run(s) in ${cqa.resultsDir} (python: ${cqa.python})`);
 });

@@ -6,6 +6,12 @@ const post = (url, body) =>
     body: JSON.stringify(body),
   }).then(j);
 
+const qs = (params) =>
+  Object.entries(params)
+    .filter(([, v]) => v !== undefined && v !== null && v !== '')
+    .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
+    .join('&');
+
 export const api = {
   health: () => fetch('/api/health').then(j),
   datasets: () => fetch('/api/datasets').then(j),
@@ -17,4 +23,24 @@ export const api = {
   answer: (body) => post('/api/answer', body),
   benchmark: (dataset, n, numPaths, warmup = 0) =>
     post('/api/benchmark', { dataset, n, numPaths, warmup }),
+
+  // ChartQAPro (vision extension). Inference happens offline on a GPU; these
+  // read the result files it leaves behind — every number is computed by
+  // chartqapro/summarize.py, not by the browser.
+  cqa: {
+    runs: () => fetch('/api/chartqapro/runs').then(j),
+    summary: (run) => fetch(`/api/chartqapro/summary?${qs({ run })}`).then(j),
+    rows: (params) => fetch(`/api/chartqapro/rows?${qs(params)}`).then(j),
+    row: (run, id) => fetch(`/api/chartqapro/row?${qs({ run, id })}`).then(j),
+    csvUrl: (run, perPath) =>
+      `/api/chartqapro/export.csv?${qs({ run, perPath: perPath ? 1 : undefined })}`,
+    upload: (name, kind, text) =>
+      fetch(`/api/chartqapro/upload?${qs({ name, kind })}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: text,
+      }).then(j),
+    remove: (run) =>
+      fetch(`/api/chartqapro/upload?${qs({ run })}`, { method: 'DELETE' }).then(j),
+  },
 };
