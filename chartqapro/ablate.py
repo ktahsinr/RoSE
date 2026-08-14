@@ -6,26 +6,34 @@
 # extensions, and re-scores each. Free, instant, CPU-only, no GPU.
 #
 #   python ablate.py results/rose_factoid_mcq_results.json
+#   python ablate.py results/rose_factoid_mcq_results.json --by-type
 #
 # WHAT THIS CAN AND CANNOT ABLATE
 # --------------------------------
-# Two of the six extensions only affect how the m per-path answers are
-# combined. Since rose_chartqapro.py logs every path's raw output and
-# extracted answer, those two can be ablated offline from ONE run:
+# Only extensions that affect how the m per-path answers are combined
+# can be ablated offline, because rose_chartqapro.py logs every path's
+# raw output and extracted answer. These two can be ablated offline from
+# ONE run:
 #
-#     numeric_vote_clustering   ✓ offline
-#     drop_malformed_paths      ✓ offline
+#     numeric_vote_clustering    ✓ offline  (changes grouping before vote)
+#     drop_malformed_paths       ✓ offline  (changes which paths vote)
+#     confidence_weighted_vote   ✓ offline  (changes vote weights)
 #
-# The other four change what the model is shown or how it decodes, so
-# they cannot be recovered from a finished run — each needs its own run:
+# The remaining extensions change what the model is SHOWN or HOW it
+# decodes, so they cannot be recovered from a finished run — each needs
+# its own run with the flag toggled:
 #
-#     mcq_permute_options       ✗ changes the prompts
-#     type_aware_retrieval      ✗ changes the demonstrations
-#     greedy_first_path         ✗ changes the sampling
-#     chart_reading_scaffold    ✗ changes the prompt
+#     mcq_permute_options        ✗ changes the prompts
+#     type_aware_retrieval       ✗ changes the demonstrations
+#     greedy_first_path          ✗ changes the sampling temperature
+#     chart_reading_scaffold     ✗ changes the prompt
+#     two_stage_reasoning        ✗ changes the prompt (pre-description)
+#     visual_hybrid_retrieval    ✗ changes which demonstrations are chosen
+#     mcq_demo_anchor_fix        ✗ changes what is stored in the pool
+#                                  (only visible after a fresh run)
 #
 # For those, set the flag in rose_chartqapro.EXTENSIONS and re-run. Each
-# run writes results/meta.json recording its configuration, so results
+# run writes results/meta_*.json recording its configuration, so results
 # files stay self-describing and the ablation table stays honest.
 # =============================================================
 
@@ -78,22 +86,40 @@ def per_path_answers(row):
     return canonical, raws
 
 
-def rescore(rows, use_clustering: bool, drop_malformed: bool):
+def compute_confidence_weights(raws):
+    """
+    Reproduce the confidence_weighted_vote logic from rose_chartqapro.py.
+    Path 0 (greedy) gets a base boost; well-formed paths get an additional
+    boost; malformed paths are down-weighted.
+    Returns a list of floats.
+    """
+    if not raws:
+        return None
+    weights = []
+    for i, raw in enumerate(raws):
+        w = 1.5 if i == 0 else 1.0          # greedy_first_path boost
+        w *= 1.3 if has_final_answer(raw) else 0.7
+        weights.append(w)
+    return weights
+
+
+def rescore(rows, use_clustering: bool, drop_malformed: bool,
+            use_conf_weights: bool):
     """Recompute the winner for every row under one aggregation config."""
     n_correct = n_total = n_skipped = 0
     for row in rows:
         if "error" in row or row.get("prediction") == "ERROR":
             continue
         qtype = str(row.get("question_type", "factoid")).lower().strip()
-        gold = row.get("ground_truth", "")
-        opts = row.get("options_shown") or row.get("choices")
+        gold  = row.get("ground_truth", "")
+        opts  = row.get("options_shown") or row.get("choices")
 
         canonical, raws = per_path_answers(row)
         if canonical is None:
             # No per-path log — fall back to the stored prediction so the
             # row still counts, and report how many were affected.
             n_skipped += 1
-            n_total += 1
+            n_total   += 1
             if is_correct(row.get("prediction", ""), gold, qtype,
                           choices=opts if qtype == "mcq" else None):
                 n_correct += 1
@@ -105,10 +131,18 @@ def rescore(rows, use_clustering: bool, drop_malformed: bool):
             if well_formed:
                 idx = well_formed
 
+        # Confidence weights (only applicable when we have raw outputs)
+        weights = None
+        if use_conf_weights and raws and len(raws) == len(canonical):
+            all_weights = compute_confidence_weights(raws)
+            if all_weights:
+                weights = [all_weights[i] for i in idx]
+
         agg = aggregate_answers(
             [canonical[i] for i in idx],
             tolerance=NUMERIC_TOLERANCE,
             use_clustering=(qtype != "mcq") and use_clustering,
+            weights=weights,
         )
         winner = agg["winner"]
         if qtype == "mcq" and len(winner) == 1:
@@ -134,9 +168,16 @@ def load(path):
 
 
 def show_meta(results_path):
-    """Print the run's recorded configuration, if meta.json sits beside it."""
-    meta_path = Path(results_path).parent / "meta.json"
-    if not meta_path.exists():
+    """Print the run's recorded configuration from the adjacent meta*.json."""
+    # Try meta_factoid.json, meta_mcq.json, meta.json
+    base = Path(results_path)
+    candidates = [
+        base.parent / f"meta_{base.stem.split('_')[-1]}.json",
+        base.parent / "meta.json",
+        base.with_suffix(".meta.json"),
+    ]
+    meta_path = next((p for p in candidates if p.exists()), None)
+    if not meta_path:
         print("  (no meta.json beside this results file — configuration "
               "unrecorded, so treat the table below with care)")
         return
@@ -147,16 +188,29 @@ def show_meta(results_path):
           f"paper_faithful={meta.get('paper_faithful')}")
     exts = meta.get("extensions", {})
     if exts:
-        on = [k for k, v in exts.items() if v] or ["none"]
-        print(f"  extensions at run time: {', '.join(on)}")
-        print("  NOTE: prompt/retrieval/decoding extensions above are baked "
-              "into this file and cannot be ablated offline.")
+        on  = [k for k, v in exts.items() if v]  or ["none"]
+        off = [k for k, v in exts.items() if not v]
+        print(f"  extensions ON  at run time : {', '.join(on)}")
+        if off:
+            print(f"  extensions OFF at run time : {', '.join(off)}")
+        # Highlight extensions that can only be ablated with a fresh run
+        needs_run = [k for k in exts if k in {
+            "mcq_permute_options", "type_aware_retrieval", "greedy_first_path",
+            "chart_reading_scaffold", "two_stage_reasoning",
+            "visual_hybrid_retrieval", "mcq_demo_anchor_fix",
+        } and exts[k]]
+        if needs_run:
+            print(f"  NOTE: {', '.join(needs_run)} are baked into this file "
+                  f"and cannot be ablated offline — they need their own run.")
 
 
 def main():
     ap = argparse.ArgumentParser(
-        description="Offline ablation of the aggregation extensions, "
-                    "recomputed from logged per-path answers. No GPU.")
+        description=(
+            "Offline ablation of aggregation extensions, recomputed from "
+            "logged per-path answers. No GPU required."
+        )
+    )
     ap.add_argument("results", help="results JSON with per-path logging")
     ap.add_argument("--by-type", action="store_true",
                     help="also break each row down by question type")
@@ -173,26 +227,30 @@ def main():
         for qt in sorted({str(r.get("question_type", "?")).lower().strip()
                           for r in rows}):
             groups.append((qt, [r for r in rows
-                                if str(r.get("question_type", "?")).lower()
-                                .strip() == qt]))
+                                 if str(r.get("question_type", "?"))
+                                 .lower().strip() == qt]))
 
+    # (name, use_clustering, drop_malformed, use_conf_weights)
     configs = [
-        ("paper-faithful aggregation (Eq. 1-3)", False, False),
-        ("+ drop malformed paths",               False, True),
-        ("+ numeric vote clustering",            True,  False),
-        ("+ both",                               True,  True),
+        ("paper-faithful (Eq. 1-3)",              False, False, False),
+        ("+ drop_malformed_paths",                 False, True,  False),
+        ("+ numeric_vote_clustering",              True,  False, False),
+        ("+ confidence_weighted_vote",             False, False, True),
+        ("+ drop_malformed + clustering",          True,  True,  False),
+        ("+ drop_malformed + conf_weights",        False, True,  True),
+        ("+ all three aggregation extensions",     True,  True,  True),
     ]
 
     for label, subset in groups:
         if not subset:
             continue
         print(f"\n  --- {label}  (n={len(subset)}) ---")
-        print(f"  {'configuration':<40} {'accuracy':>18}")
-        print(f"  {'-' * 40} {'-' * 18}")
-        baseline = None
-        skipped = 0
-        for name, clustering, drop in configs:
-            correct, total, n_skip = rescore(subset, clustering, drop)
+        print(f"  {'configuration':<44} {'accuracy':>14}")
+        print(f"  {'-' * 44} {'-' * 14}")
+        baseline  = None
+        skipped   = 0
+        for name, clustering, drop, conf_w in configs:
+            correct, total, n_skip = rescore(subset, clustering, drop, conf_w)
             skipped = max(skipped, n_skip)
             acc = correct / total * 100 if total else 0.0
             if baseline is None:
@@ -200,16 +258,19 @@ def main():
                 delta = ""
             else:
                 delta = f"  ({acc - baseline:+.1f}pp)"
-            print(f"  {name:<40} {acc:5.1f}%  ({correct}/{total}){delta}")
+            print(f"  {name:<44} {acc:5.1f}%  ({correct}/{total}){delta}")
         if skipped:
             print(f"  ⚠  {skipped} rows had no per-path log; their stored "
-                  f"prediction was used unchanged in every row above, so the "
-                  f"deltas understate the real effect.")
+                  f"prediction was used unchanged — deltas understate the "
+                  f"real effect.")
 
     print(f"\n{'=' * 72}")
-    print("  Offline-ablatable: numeric_vote_clustering, drop_malformed_paths")
-    print("  Needs its own run: mcq_permute_options, type_aware_retrieval,")
-    print("                     greedy_first_path, chart_reading_scaffold")
+    print("  Offline-ablatable  : numeric_vote_clustering, drop_malformed_paths,")
+    print("                       confidence_weighted_vote")
+    print("  Needs its own run  : mcq_permute_options, type_aware_retrieval,")
+    print("                       greedy_first_path, chart_reading_scaffold,")
+    print("                       two_stage_reasoning, visual_hybrid_retrieval,")
+    print("                       mcq_demo_anchor_fix")
     print(f"{'=' * 72}\n")
 
 

@@ -6,6 +6,15 @@
 # decoupled from inference. Imported by both:
 #   rose_chartqapro.py   (scores during the run)
 #   rescore_judge.py     (re-scores a finished results file)
+#   ablate.py            (offline aggregation ablation)
+#
+# CHANGES FROM ORIGINAL:
+#   aggregate_answers() — added optional `weights` parameter for
+#   confidence-weighted voting (EXTENSION confidence_weighted_vote).
+#   Empty-string non-answers are now excluded from the vote (bug fix:
+#   original Counter included them, so 2 empty paths beat 1 valid answer).
+#   When weights=None, behaviour is identical to the original except
+#   for the empty-string fix.
 # =============================================================
 
 import re
@@ -247,7 +256,7 @@ def split_gold(ground_truth) -> list:
 
 
 # ─────────────────────────────────────────────────────────────
-# Vote aggregation  (paper Eq. 1–3, plus an optional extension)
+# Vote aggregation  (paper Eq. 1–3, plus extensions)
 # ─────────────────────────────────────────────────────────────
 # Lives here rather than in the pipeline so ablate.py can recompute
 # aggregation offline from logged per-path answers, with no GPU.
@@ -268,40 +277,45 @@ def cluster_numeric(values, tolerance: float = NUMERIC_TOLERANCE) -> list:
     return sorted(clusters, key=len, reverse=True)
 
 
-def _entropy(group_sizes: list, total: int) -> float:
-    """Shannon entropy over group sizes, normalized to [0, 1] (Eq. 3)."""
+def _entropy(group_sizes: list, total) -> float:
+    """
+    Shannon entropy over group sizes, normalized to [0, 1] (Eq. 3).
+    `total` and `group_sizes` may be floats (for weighted voting).
+    """
     import math
-    if total <= 1:
+    if total <= 1e-9:
         return 0.0
     ent = -sum((s / total) * math.log(s / total + 1e-12) for s in group_sizes)
-    return ent / (math.log(total) + 1e-12)
+    return min(1.0, max(0.0, ent / (math.log(total) + 1e-12)))
 
 
 def aggregate_answers(canonical: list, tolerance: float = NUMERIC_TOLERANCE,
-                      use_clustering: bool = False) -> dict:
+                      use_clustering: bool = False,
+                      weights: list = None) -> dict:
     """
     Aggregate m per-path canonical answers into one verdict.
 
-    PAPER-FAITHFUL MODE (use_clustering=False) — exact-string majority
-    vote and entropy over distinct answers, as in Eq. 1-3.
+    PAPER-FAITHFUL MODE (use_clustering=False, weights=None) — exact-string
+    majority vote and entropy over distinct answers, as in Eq. 1-3.
 
-    EXTENSION (use_clustering=True) — when every path produced a number,
-    group them within `tolerance` first, take the MEDIAN of the largest
-    group, and compute entropy over groups.
+    EXTENSION numeric_vote_clustering (use_clustering=True) — when every
+    path produced a number, group them within `tolerance` first, take the
+    MEDIAN of the largest group, and compute entropy over groups.
 
-    Why the extension: for continuous chart values at m=3, byte-identical
-    agreement is rare, so exact-string mode usually finds no majority and
-    Counter.most_common silently returns whichever answer came first —
-    i.e. path 0, arbitrarily. If path 0 is the outlier you take the
-    outlier and discard two agreeing paths. It also reports entropy 1.0
-    (maximum disagreement) for answers that agree to within 1%, which is
-    the signal Eq. 6-7 filters the experience pool on.
+    EXTENSION confidence_weighted_vote (weights=[...]) — instead of
+    equal votes, each path is given a weight. Paths that produced a
+    well-formed 'Final Answer:' line and the greedy path get higher weight.
+    The weighted counts replace the plain Counter. When weights=None the
+    behaviour is identical to the original except that empty-string
+    non-answers are now correctly excluded from the vote (bug fix: the
+    original Counter included them, allowing 2 empty paths to out-vote
+    1 valid answer).
 
     Returns:
       winner      str   — the winning canonical answer
       members     list  — indices of the paths backing the winner (R* in Eq. 4)
-      uncertainty float — normalized entropy
-      agreement   float — share of paths backing the winner
+      uncertainty float — normalized entropy (weighted when weights given)
+      agreement   float — weight share of the winning answer
       n_groups    int   — distinct answers (or clusters)
       mode        str   — "cluster" or "exact"
     """
@@ -310,17 +324,21 @@ def aggregate_answers(canonical: list, tolerance: float = NUMERIC_TOLERANCE,
         return {"winner": "", "members": [], "uncertainty": 0.0,
                 "agreement": 0.0, "n_groups": 0, "mode": "exact"}
 
+    # Default to uniform weights so the weighted path covers the original
+    # behaviour as a special case.
+    if weights is None:
+        weights = [1.0] * total
+
+    # ── Numeric clustering (factoid extension) ─────────────────
+    # Clustering operates on the raw list (weights not applied —
+    # clustering identifies numerical agreement, not confidence).
     if use_clustering:
         values = [number_variants(a) for a in canonical]
-        # Only cluster when EVERY path gave a number. A mix of numeric and
-        # textual answers is not safely comparable on a number line.
         if all(v for v in values) and total > 1:
             primary = [v[0] for v in values]
             clusters = cluster_numeric(primary, tolerance)
             best = sorted(clusters[0])
             median = best[len(best) // 2]
-
-            # Paths whose value falls in the winning cluster.
             members = [i for i, v in enumerate(primary)
                        if any(v == b for b in clusters[0])]
             return {
@@ -332,14 +350,32 @@ def aggregate_answers(canonical: list, tolerance: float = NUMERIC_TOLERANCE,
                 "mode":        "cluster",
             }
 
-    counts = Counter(canonical)
-    winner = counts.most_common(1)[0][0]
+    # ── Weighted exact-match voting ────────────────────────────
+    # Empty-string answers are excluded — they represent failed extractions
+    # and should not out-vote valid answers.
+    weighted_counts: dict = {}
+    for ans, w in zip(canonical, weights):
+        if ans:                              # skip non-answers
+            weighted_counts[ans] = weighted_counts.get(ans, 0.0) + w
+
+    if not weighted_counts:
+        # Every path produced an empty answer.
+        return {"winner": "", "members": list(range(total)),
+                "uncertainty": 1.0, "agreement": 0.0,
+                "n_groups": 0, "mode": "exact"}
+
+    total_weight = sum(weighted_counts.values())
+    winner = max(weighted_counts, key=weighted_counts.get)
+    winner_weight = weighted_counts[winner]
+    members = [i for i, a in enumerate(canonical) if a == winner]
+    n_groups = len(weighted_counts)
+
     return {
         "winner":      winner,
-        "members":     [i for i, a in enumerate(canonical) if a == winner],
-        "uncertainty": _entropy(list(counts.values()), total),
-        "agreement":   counts[winner] / total,
-        "n_groups":    len(counts),
+        "members":     members,
+        "uncertainty": _entropy(list(weighted_counts.values()), total_weight),
+        "agreement":   winner_weight / max(total_weight, 1e-9),
+        "n_groups":    n_groups,
         "mode":        "exact",
     }
 
