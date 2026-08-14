@@ -204,6 +204,62 @@ def show_meta(results_path):
                   f"and cannot be ablated offline — they need their own run.")
 
 
+# The aggregation configurations the ablation compares.
+# (name, use_clustering, drop_malformed, use_conf_weights)
+# Order matters: the first is the baseline every delta is measured against.
+CONFIGS = [
+    ("paper-faithful (Eq. 1-3)",              False, False, False),
+    ("+ drop_malformed_paths",                 False, True,  False),
+    ("+ numeric_vote_clustering",              True,  False, False),
+    ("+ confidence_weighted_vote",             False, False, True),
+    ("+ drop_malformed + clustering",          True,  True,  False),
+    ("+ drop_malformed + conf_weights",        False, True,  True),
+    ("+ all three aggregation extensions",     True,  True,  True),
+]
+
+
+def ablation_table(rows, by_type: bool = False) -> list:
+    """
+    The printed table, as data. Same numbers main() shows — kept in one place
+    so the CLI, summarize.py and the web dashboard can never disagree.
+
+    Returns [{label, n, configs: [{name, clustering, drop_malformed,
+              conf_weights, correct, total, acc, delta}], skipped}].
+    """
+    groups = [("all", rows)]
+    if by_type:
+        for qt in sorted({str(r.get("question_type", "?")).lower().strip()
+                          for r in rows}):
+            groups.append((qt, [r for r in rows
+                                if str(r.get("question_type", "?"))
+                                .lower().strip() == qt]))
+
+    table = []
+    for label, subset in groups:
+        if not subset:
+            continue
+        entries, baseline, skipped = [], None, 0
+        for name, clustering, drop, conf_w in CONFIGS:
+            correct, total, n_skip = rescore(subset, clustering, drop, conf_w)
+            acc = correct / total * 100 if total else 0.0
+            if baseline is None:
+                baseline = acc
+            skipped = max(skipped, n_skip)
+            entries.append({
+                "name":           name,
+                "clustering":     clustering,
+                "drop_malformed": drop,
+                "conf_weights":   conf_w,
+                "correct":        correct,
+                "total":          total,
+                "acc":            round(acc, 2),
+                "delta":          round(acc - baseline, 2),
+            })
+        table.append({"label": label, "n": len(subset),
+                      "configs": entries, "skipped": skipped})
+    return table
+
+
 def main():
     ap = argparse.ArgumentParser(
         description=(
@@ -214,55 +270,33 @@ def main():
     ap.add_argument("results", help="results JSON with per-path logging")
     ap.add_argument("--by-type", action="store_true",
                     help="also break each row down by question type")
+    ap.add_argument("--json", action="store_true",
+                    help="emit the table as JSON on stdout (for the web API)")
     args = ap.parse_args()
 
     rows = load(args.results)
+
+    if args.json:
+        print(json.dumps(ablation_table(rows, by_type=args.by_type), indent=2))
+        return
+
     print(f"\n{'=' * 72}")
     print(f"  AGGREGATION ABLATION — {args.results}")
     print(f"{'=' * 72}")
     show_meta(args.results)
 
-    groups = [("all", rows)]
-    if args.by_type:
-        for qt in sorted({str(r.get("question_type", "?")).lower().strip()
-                          for r in rows}):
-            groups.append((qt, [r for r in rows
-                                 if str(r.get("question_type", "?"))
-                                 .lower().strip() == qt]))
-
-    # (name, use_clustering, drop_malformed, use_conf_weights)
-    configs = [
-        ("paper-faithful (Eq. 1-3)",              False, False, False),
-        ("+ drop_malformed_paths",                 False, True,  False),
-        ("+ numeric_vote_clustering",              True,  False, False),
-        ("+ confidence_weighted_vote",             False, False, True),
-        ("+ drop_malformed + clustering",          True,  True,  False),
-        ("+ drop_malformed + conf_weights",        False, True,  True),
-        ("+ all three aggregation extensions",     True,  True,  True),
-    ]
-
-    for label, subset in groups:
-        if not subset:
-            continue
-        print(f"\n  --- {label}  (n={len(subset)}) ---")
+    for group in ablation_table(rows, by_type=args.by_type):
+        print(f"\n  --- {group['label']}  (n={group['n']}) ---")
         print(f"  {'configuration':<44} {'accuracy':>14}")
         print(f"  {'-' * 44} {'-' * 14}")
-        baseline  = None
-        skipped   = 0
-        for name, clustering, drop, conf_w in configs:
-            correct, total, n_skip = rescore(subset, clustering, drop, conf_w)
-            skipped = max(skipped, n_skip)
-            acc = correct / total * 100 if total else 0.0
-            if baseline is None:
-                baseline = acc
-                delta = ""
-            else:
-                delta = f"  ({acc - baseline:+.1f}pp)"
-            print(f"  {name:<44} {acc:5.1f}%  ({correct}/{total}){delta}")
-        if skipped:
-            print(f"  ⚠  {skipped} rows had no per-path log; their stored "
-                  f"prediction was used unchanged — deltas understate the "
-                  f"real effect.")
+        for i, c in enumerate(group["configs"]):
+            delta = "" if i == 0 else f"  ({c['delta']:+.1f}pp)"
+            print(f"  {c['name']:<44} {c['acc']:5.1f}%  "
+                  f"({c['correct']}/{c['total']}){delta}")
+        if group["skipped"]:
+            print(f"  ⚠  {group['skipped']} rows had no per-path log; their "
+                  f"stored prediction was used unchanged — deltas understate "
+                  f"the real effect.")
 
     print(f"\n{'=' * 72}")
     print("  Offline-ablatable  : numeric_vote_clustering, drop_malformed_paths,")
