@@ -1,0 +1,3 @@
+# Run outputs land here (results/*.json + meta.json).
+# Real runs are large; keep them out of git, but keep the folder so the
+# pipeline and the web API always have somewhere to look.

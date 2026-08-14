@@ -10,6 +10,12 @@ __pycache__/
 dist/
 build/
 
+# ChartQAPro run outputs — a real run logs every generation and is far too
+# large for git. Keep the folder (and the checked-in .gitkeep) so the pipeline
+# and the web API always have somewhere to look.
+chartqapro/results/*
+!chartqapro/results/.gitkeep
+
 # Environment / secrets
 .env
 .env.*
