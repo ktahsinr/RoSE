@@ -1,0 +1,3 @@
+# Pilot artifacts (sample_ids.json, pilot_*.json, routing_pool.json,
+# pilot_report.json) ARE committed — they are small and every Stage 2
+# number depends on them. Big sweep outputs stay in ../ and stay ignored.

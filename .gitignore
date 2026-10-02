@@ -16,6 +16,12 @@ build/
 chartqapro/results/*
 !chartqapro/results/.gitkeep
 
+# …except the routing pilot: the 150-question sample, the per-model pilot
+# results, the routing pool and the pilot report are small and every Stage 2
+# number depends on them, so they ARE versioned.
+!chartqapro/results/pilot/
+!chartqapro/results/pilot/*
+
 # Environment / secrets
 .env
 .env.*

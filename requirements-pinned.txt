@@ -1,0 +1,33 @@
+# =============================================================
+# Pinned GPU-stack versions for the ChartQAPro runs
+# =============================================================
+# Install with:  pip install -r requirements-pinned.txt
+#
+# transformers is the only version the final-week 7B sweep pinned
+# explicitly (Notebook/RoSE_ChartQAPro_Factoid_Kaggle.ipynb, Cell 2);
+# the rest came from the Kaggle image of the day plus ">=" floors.
+# routing/pilot_runner.py now writes the exact installed versions and
+# the resolved model revision into every *_meta.json it produces —
+# UPDATE the "from the pilot run" pins below from that file after the
+# first pilot session, and pin the model revisions in
+# chartqapro/routing/config.py at the same time.
+#
+# CPU-side tools (scoring.py, ablate.py, summarize.py, routing/) need
+# none of this except numpy and, for building the routing pool,
+# sentence-transformers.
+# =============================================================
+
+# pinned by the final-week 7B sweep notebook
+transformers==4.51.3
+
+# floors used by the final-week sweep — REPLACE with the exact versions
+# recorded in results/pilot/pilot_*_meta.json after the first pilot run
+torch                       # Kaggle image default; TODO pin from meta
+accelerate>=0.34            # TODO pin from meta
+bitsandbytes>=0.43          # TODO pin from meta
+sentence-transformers>=3.0  # TODO pin from meta
+datasets>=2.19              # TODO pin from meta
+
+# model revisions (HuggingFace commit shas) live next to the model ids in
+# chartqapro/routing/config.py — "revision: None" means unpinned, and the
+# resolved sha is recorded in each run's meta output.

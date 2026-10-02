@@ -163,3 +163,69 @@ ablation, the judge's verdicts, and every question with its individual reasoning
 paths. Numbers come from `summarize.py`, so the dashboard and the CLI tables can
 never disagree. The backend shells out to `python3` for this — set `ROSE_PYTHON`
 if it is not on your PATH.
+
+## Model Routing (Stage 1 — pilot)
+
+Running every chart question through the 7B model is wasteful: many questions
+are easy enough for a 4B model that answers in a fraction of the time. The
+routing extension decides **per question** which model to use — not with a
+trained classifier, but with the same ingredient RoSE itself is built on:
+**experience**.
+
+The idea in plain language: on a small pilot sample, run *all* the candidate
+models and remember which ones got each question right. For every new
+question, find the most similar pilot questions (same `all-mpnet-base-v2`
+embeddings RoSE retrieves demonstrations with) and ask: *did the small model
+get questions like this right?* If its similarity-weighted hit rate over the
+K=5 nearest neighbours clears a threshold (τ=0.6), route the question there;
+otherwise escalate — the 7B model is always the fallback, never a gamble.
+
+| Model | Role | Params |
+|---|---|---|
+| `google/gemma-3-4b-it` | cheap first choice | 4.3B |
+| `Qwen/Qwen3.5-4B` (unified VL) | cheap second choice | 4.0B |
+| `Qwen/Qwen2.5-VL-7B-Instruct` | fallback / escalation | 8.3B |
+
+All 4-bit on a T4. Everything lives in `chartqapro/routing/`; only
+`pilot_runner.py` needs a GPU. Correctness inside the pool is recomputed with
+`scoring.py`, so the router can never disagree with the dashboard about what
+"got it right" means.
+
+### Reproduce the pilot
+
+```bash
+cd chartqapro
+
+# 1. the seeded 150-question sample, drawn from the cached 7B run's ids
+python scripts/make_pilot_sample.py results/rose_factoid.json \
+       --n 150 --seed 499 --out results/pilot/sample_ids.json
+
+# 2. (GPU, once per 4B model — Kaggle/Colab) RoSE over the sample
+python -m routing.pilot_runner --model gemma3-4b \
+       --dataset chartqapro_factoid.json \
+       --sample results/pilot/sample_ids.json \
+       --out results/pilot/pilot_gemma3-4b.json
+# …and again with --model qwen3.5-4b
+
+# 3. build the routing pool (CPU; 7B hits come from the cached full run)
+python -m routing.pool \
+       --results gemma3-4b=results/pilot/pilot_gemma3-4b.json \
+                 qwen3.5-4b=results/pilot/pilot_qwen3.5-4b.json \
+                 qwen2.5-vl-7b=results/rose_factoid.json \
+       --sample results/pilot/sample_ids.json \
+       --out results/pilot/routing_pool.json
+
+# 4. every pilot number: per-model accuracy & latency, leave-one-out routed
+#    accuracy vs always-7B vs oracle, routing shares, mean params per query
+python -m routing.evaluate_pilot results/pilot/routing_pool.json \
+       --out results/pilot/pilot_report.json
+
+# CPU tests (synthetic embeddings, no downloads)
+python tests/test_routing.py
+```
+
+Exact library versions are pinned in `requirements-pinned.txt`; each pilot
+run also writes the resolved model revision and installed versions into its
+`*_meta.json`, so a finished run is self-describing. Stage 2 (routing the
+remaining ~930 factoid questions on Kaggle and merging with the cached 7B
+answers) is a separate notebook built on `routing/router.py::route_file`.
