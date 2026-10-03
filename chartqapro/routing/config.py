@@ -16,6 +16,9 @@ MODELS = {
         "revision": None,          # TODO: pin to the sha your pilot run used
         "params_b": 4.3,           # nominal, for the mean-params-per-query metric
         "label":    "Gemma 3 4B-it",
+        # Gemma 3 activations overflow float16 (NaN logits → CUDA assert
+        # under sampling). pilot_runner computes it in bf16/fp32 instead.
+        "fp16_safe": False,
     },
     "qwen3.5-4b": {
         "hf_id":    "Qwen/Qwen3.5-4B",     # unified VL model — no separate -VL variant

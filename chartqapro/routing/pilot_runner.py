@@ -54,15 +54,28 @@ def load_vlm(model_key: str, quant: str = "nf4"):
     fp4 (the bitsandbytes default). The pilot spec says NF4 for all three
     models — that is this function's default. To reproduce the 7B sweep's
     exact numbers instead, pass --quant fp4.
+
+    NOTE on dtype: Gemma 3's activations overflow float16 — NaN logits,
+    and sampling on a NaN probability tensor fires a CUDA device-side
+    assert that poisons the context (every later call errors instantly).
+    Models flagged fp16_safe=False in the registry therefore compute in
+    bfloat16 where the GPU supports it, else float32 (a T4 does not
+    support bf16 — expect roughly 2x the fp16 latency there).
     """
     import torch
     from transformers import AutoProcessor, BitsAndBytesConfig
 
     spec = MODELS[model_key]
+    if spec.get("fp16_safe", True):
+        dtype = torch.float16
+    elif torch.cuda.is_available() and torch.cuda.is_bf16_supported():
+        dtype = torch.bfloat16
+    else:
+        dtype = torch.float32
     bnb = BitsAndBytesConfig(
         load_in_4bit=True,
         bnb_4bit_quant_type=quant,
-        bnb_4bit_compute_dtype=torch.float16,
+        bnb_4bit_compute_dtype=dtype,
         bnb_4bit_use_double_quant=True,
     )
     common = dict(revision=spec["revision"], trust_remote_code=True)
@@ -78,9 +91,11 @@ def load_vlm(model_key: str, quant: str = "nf4"):
     except ImportError:             # older transformers
         from transformers import AutoModelForVision2Seq as _Auto
     model = _Auto.from_pretrained(
-        spec["hf_id"], quantization_config=bnb, device_map="auto", **common,
+        spec["hf_id"], quantization_config=bnb, device_map="auto",
+        torch_dtype=dtype, **common,
     )
     model.eval()
+    print(f"compute dtype: {dtype}")
 
     revision = getattr(model.config, "_commit_hash", None) or spec["revision"]
     return model, processor, revision
@@ -143,6 +158,12 @@ def run_pilot(model_key: str, dataset_path, sample_path, out_path,
         clip_model, clip_processor = rose.load_clip()
 
     results = json.loads(ckpt.read_text()) if ckpt.exists() else []
+    # Error rows (e.g. everything after a CUDA assert poisoned the context)
+    # are dropped so those questions are RETRIED, not skipped forever.
+    n_err = sum(1 for r in results if r.get("method") == "error")
+    if n_err:
+        print(f"↩  dropping {n_err} error row(s) from the checkpoint — will retry")
+        results = [r for r in results if r.get("method") != "error"]
     done = {str(r.get("id")) for r in results}
     if done:
         print(f"↩  resuming: {len(done)}/{len(data)} already answered")
