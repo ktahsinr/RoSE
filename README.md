@@ -207,7 +207,8 @@ python -m routing.pilot_runner --model gemma3-4b \
        --out results/pilot/pilot_gemma3-4b.json
 # …and again with --model qwen3.5-4b
 
-# 3. build the routing pool (CPU; 7B hits come from the cached full run)
+# 3. build the routing pool (CPU; 7B hits come from the cached run —
+#    see results/pilot/PROVENANCE.md: it covers the first 540 questions)
 python -m routing.pool \
        --results gemma3-4b=results/pilot/pilot_gemma3-4b.json \
                  qwen3.5-4b=results/pilot/pilot_qwen3.5-4b.json \
@@ -226,6 +227,9 @@ python tests/test_routing.py
 
 Exact library versions are pinned in `requirements-pinned.txt`; each pilot
 run also writes the resolved model revision and installed versions into its
-`*_meta.json`, so a finished run is self-describing. Stage 2 (routing the
-remaining ~930 factoid questions on Kaggle and merging with the cached 7B
-answers) is a separate notebook built on `routing/router.py::route_file`.
+`*_meta.json`, so a finished run is self-describing. The cached 7B run
+covers the **first 540** factoid questions (`results/pilot/PROVENANCE.md`
+has the full story), so the pilot lives inside that half. Stage 2 (routing
+the remaining questions on Kaggle) is a separate notebook built on
+`routing/router.py::route_file`; its routed-vs-always-7B comparison is
+limited to the cached half unless the 7B arm is re-run.
