@@ -13,7 +13,8 @@
 MODELS = {
     "gemma3-4b": {
         "hf_id":    "google/gemma-3-4b-it",
-        "revision": None,          # TODO: pin to the sha your pilot run used
+        # resolved by the pilot session of 2026-10-03 (printed by load_vlm)
+        "revision": "093f9f388b31de276ce2de164bdc2081324b9767",
         "params_b": 4.3,           # nominal, for the mean-params-per-query metric
         "label":    "Gemma 3 4B-it",
         # Gemma 3 activations overflow float16 (NaN logits → CUDA assert
