@@ -28,12 +28,13 @@ except ImportError:
 
 
 COLUMNS = [
-    "id", "question_type", "question", "ground_truth",
+    "id", "question_type", "model_key", "question", "ground_truth",
     "prediction", "prediction_norm",
     "is_correct_run", "is_correct_rescored", "judge_correct", "judge_category",
     "gold_unanswerable", "pred_unanswerable",
     "method", "uncertainty", "complexity", "agreement",
     "vote_mode", "n_groups", "paths_voting", "n_demos", "pool_size",
+    "latency_s", "routing_scores",
     "extracted_paths", "normalized_paths", "error",
 ]
 
@@ -85,6 +86,10 @@ def build_row(r, verdicts):
         "paths_voting":        r.get("paths_voting", ""),
         "n_demos":             r.get("n_demos", ""),
         "pool_size":           r.get("pool_size", ""),
+        "model_key":           r.get("model_key", ""),
+        "latency_s":           r.get("latency_s", ""),
+        "routing_scores":      json.dumps((r.get("routing") or {}).get("scores"))
+                               if r.get("routing") else "",
         "extracted_paths":     " | ".join(map(str, r.get("extracted") or [])),
         "normalized_paths":    " | ".join(map(str, r.get("normalized") or [])),
         "error":               r.get("error", ""),
@@ -119,12 +124,48 @@ def write_per_path(rows, out_path):
     return n
 
 
+def write_summary(rows, verdicts, out_path):
+    """
+    One accuracy row per answering model plus an overall row — the
+    routed-run report as a CSV. Accuracy is the RESCORED verdict.
+    """
+    scored = [(r, build_row(r, verdicts)) for r in rows]
+    valid = [(r, b) for r, b in scored
+             if "error" not in r and str(r.get("prediction", "")).strip() != "ERROR"]
+    models = sorted({b["model_key"] for _, b in valid if b["model_key"]})
+
+    def agg(sub, label):
+        n_ok = sum(b["is_correct_rescored"] for _, b in sub)
+        lats = [r["latency_s"] for r, _ in sub
+                if isinstance(r.get("latency_s"), (int, float))]
+        return {
+            "model":            label,
+            "n_answered":       len(sub),
+            "n_correct":        n_ok,
+            "accuracy_pct":     round(n_ok / max(len(sub), 1) * 100, 2),
+            "share_pct":        round(len(sub) / max(len(valid), 1) * 100, 2),
+            "mean_latency_s":   round(sum(lats) / len(lats), 2) if lats else "",
+        }
+
+    out_rows = [agg([(r, b) for r, b in valid if b["model_key"] == m], m)
+                for m in models]
+    out_rows.append(agg(valid, "OVERALL"))
+
+    with out_path.open("w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=list(out_rows[0]))
+        w.writeheader()
+        w.writerows(out_rows)
+    return out_rows
+
+
 def main():
     ap = argparse.ArgumentParser(description="Export results JSON to CSV.")
     ap.add_argument("results")
     ap.add_argument("-o", "--out", help="output CSV (default: alongside input)")
     ap.add_argument("--per-path", action="store_true",
                     help="also write a second CSV with one row per path")
+    ap.add_argument("--summary", action="store_true",
+                    help="also write <out>_summary.csv: accuracy per model + overall")
     ap.add_argument("--verdicts",
                     help="judge verdicts JSON from rescore_judge.py --out")
     args = ap.parse_args()
@@ -159,6 +200,15 @@ def main():
         pp = out.with_name(out.stem + "_per_path.csv")
         n = write_per_path(rows, pp)
         print(f"✓ {pp}  ({n} path rows)")
+
+    if args.summary:
+        sp = out.with_name(out.stem + "_summary.csv")
+        srows = write_summary(rows, verdicts, sp)
+        print(f"✓ {sp}")
+        for s in srows:
+            print(f"  {s['model']:<16} {s['n_correct']:>4}/{s['n_answered']:<4} "
+                  f"= {s['accuracy_pct']:5.1f}%   share {s['share_pct']:5.1f}%"
+                  + (f"   {s['mean_latency_s']}s/q" if s['mean_latency_s'] != "" else ""))
 
 
 if __name__ == "__main__":
