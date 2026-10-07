@@ -10,10 +10,13 @@
 #   2. runs the repo's real RoSE pipeline (rose_chartqapro.process_one)
 #      with the routed model.
 #
-# Questions are grouped by routed model and executed cheapest-model
-# first, so each VLM is loaded exactly once per session and the GPU
-# never holds two models. Each model streams its OWN experience pool
-# over its share, exactly as the pilot and the 7B sweep did.
+# By default questions are answered in DATASET ORDER — per question:
+# look up the routed model, run RoSE with it, predict — with all routed
+# models resident on the GPU (interleave=True; ~13 GB for three 4-bit
+# VLMs, fine on a T4 x2). interleave=False instead groups questions by
+# model, cheapest first, one VLM on the GPU at a time (for single-GPU
+# sessions); predictions are identical either way. Each model streams
+# its OWN experience pool, exactly as the pilot and the 7B sweep did.
 #
 # Checkpoints after every question; on restart answered ids are
 # skipped, so a run survives Kaggle's session cap.
@@ -122,7 +125,8 @@ def _free_gpu(*objs):
 
 def run_routed(dataset_path, decisions, out_path,
                quant: str = "nf4", order=None, token_budget=None,
-               embedder=None, limit=None, stop_after_s=None):
+               embedder=None, limit=None, stop_after_s=None,
+               interleave: bool = True):
     """
     GPU step: answer every question with its routed model via RoSE.
 
@@ -134,10 +138,17 @@ def run_routed(dataset_path, decisions, out_path,
                    finishes inside the session cap and PUBLISHES the
                    checkpoint instead of being killed with nothing.
                    Resume the next session via the checkpoint.
-
-    Models are processed in ESCALATION_ORDER; each is loaded once,
-    answers its routed share (streaming its own experience pool), and
-    is freed before the next loads.
+    interleave   : True (default) answers in DATASET ORDER — per
+                   question: look up the routed model, run RoSE with it,
+                   predict — with every routed model resident on the GPU
+                   (needs ~13 GB for all three 4-bit VLMs; a T4 x2 is
+                   fine). A partial checkpoint is then an unbiased
+                   prefix of the dataset. False groups questions by
+                   model, cheapest first, one VLM on the GPU at a time —
+                   for single-16GB-GPU sessions. The predictions are
+                   IDENTICAL either way (each model sees its own
+                   questions in the same relative order; routing was
+                   decided per question before any GPU work).
     """
     t_start = time.time()
     out_path = Path(out_path)
@@ -175,76 +186,120 @@ def run_routed(dataset_path, decisions, out_path,
     if rose.ext("visual_hybrid_retrieval"):
         clip_model, clip_processor = rose.load_clip()
 
-    by_model = {m: [s for s in data if dec[str(s.get("id"))]["model"] == m]
-                for m in order}
     base_tokens = rose.MAX_NEW_TOKENS
     revisions = {}
-    answered = 0
     out_of_time = False
 
-    for model_key in order:
-        if out_of_time:
-            break
-        share = [s for s in by_model.get(model_key, [])
-                 if str(s.get("id")) not in done]
-        if not share:
-            continue
-        print(f"\n━━ {model_key}: {len(share)} question(s) ━━")
-        model, processor, revision = load_vlm(model_key, quant=quant)
-        revisions[model_key] = revision
+    # One streaming experience pool PER MODEL, rebuilt from the
+    # checkpoint — a model only ever learns from its own answers,
+    # exactly as the pilot and the 7B sweep did.
+    pools = {}
+
+    def _pool_for(model_key):
+        if model_key not in pools:
+            pool = rose.ExperiencePool(embedder)
+            for r in results:
+                if r.get("model_key") != model_key or r.get("method") == "error":
+                    continue
+                pool.add(question=r["question"],
+                         rationale=r.get("best_rationale") or r.get("prediction", ""),
+                         answer=r.get("prediction", ""),
+                         qtype=r.get("question_type", "factoid"),
+                         uncertainty=r.get("uncertainty", 0.5),
+                         complexity=r.get("complexity", 1.0),
+                         clip_emb=None)
+            pools[model_key] = pool
+        return pools[model_key]
+
+    def _answer(sample, model_key, model, processor):
+        qid = str(sample.get("id"))
+        pool = _pool_for(model_key)
         rose.MAX_NEW_TOKENS = token_budget.get(model_key, base_tokens)
-        if rose.MAX_NEW_TOKENS != base_tokens:
-            print(f"   max_new_tokens {base_tokens} → {rose.MAX_NEW_TOKENS} for {model_key}")
+        t0 = time.time()
+        try:
+            r = rose.process_one(sample, model, processor, pool,
+                                 clip_model=clip_model,
+                                 clip_processor=clip_processor)
+        except Exception as exc:
+            import traceback
+            traceback.print_exc()
+            r = {"id": qid, "question": sample.get("question", ""),
+                 "question_type": sample.get("question_type", "factoid"),
+                 "ground_truth": sample.get("answer", ""),
+                 "prediction": "ERROR", "is_correct": False,
+                 "error": str(exc), "method": "error"}
+        finally:
+            rose.MAX_NEW_TOKENS = base_tokens
+        r["latency_s"] = round(time.time() - t0, 2)
+        r["model_key"] = model_key
+        r["routing"] = {k: dec[qid][k] for k in ("model", "scores") if k in dec[qid]}
+        results.append(r)
+        done.add(qid)
+        ckpt.write_text(json.dumps(results, indent=2))
 
-        # This model's streaming pool, rebuilt from ITS checkpoint rows.
-        pool = rose.ExperiencePool(embedder)
-        for r in results:
-            if r.get("model_key") != model_key or r.get("method") == "error":
-                continue
-            pool.add(question=r["question"],
-                     rationale=r.get("best_rationale") or r.get("prediction", ""),
-                     answer=r.get("prediction", ""),
-                     qtype=r.get("question_type", "factoid"),
-                     uncertainty=r.get("uncertainty", 0.5),
-                     complexity=r.get("complexity", 1.0),
-                     clip_emb=None)
+        mark = "✓" if r.get("is_correct") else "✗"
+        print(f"[{len(done):03d}/{len(data)}] {mark} {model_key} "
+              f"pool={pool.size():<3} {r['latency_s']:6.1f}s "
+              f"pred={str(r.get('prediction'))[:28]}", flush=True)
 
-        for sample in share:
-            if stop_after_s is not None and time.time() - t_start > stop_after_s:
+    def _budget_up():
+        if stop_after_s is not None and time.time() - t_start > stop_after_s:
+            print(f"⏱  session budget ({stop_after_s / 3600:.1f} h) reached — "
+                  f"stopping cleanly with {len(done)}/{len(data)} answered; "
+                  "resume the next session from the checkpoint")
+            return True
+        return False
+
+    pending = [s for s in data if str(s.get("id")) not in done]
+    needed = [m for m in order
+              if any(dec[str(s.get("id"))]["model"] == m for s in pending)]
+
+    if interleave:
+        # ── dataset order: route → reason → predict, per question ──
+        # Every routed model is loaded up front and stays resident
+        # (three 4-bit VLMs ≈ 13 GB — fine on a T4 x2's 32 GB, tight on
+        # a single 16 GB GPU, where grouped mode is the safer choice).
+        try:
+            import torch
+            if torch.cuda.is_available() and torch.cuda.device_count() < 2 \
+                    and len(needed) > 2:
+                print("⚠ one GPU visible: three resident 4-bit VLMs are tight "
+                      "on 16 GB — if loading OOMs, use interleave=False")
+        except Exception:
+            pass
+        loaded = {}
+        for m in needed:
+            model, processor, revision = load_vlm(m, quant=quant)
+            loaded[m] = (model, processor)
+            revisions[m] = revision
+        print(f"\n━━ {len(pending)} question(s), dataset order, "
+              f"models resident: {', '.join(needed)} ━━")
+        for sample in pending:
+            if _budget_up():
                 out_of_time = True
-                print(f"⏱  session budget ({stop_after_s / 3600:.1f} h) reached — "
-                      f"stopping cleanly with {len(done)}/{len(data)} answered; "
-                      "resume the next session from the checkpoint")
                 break
-            qid = str(sample.get("id"))
-            t0 = time.time()
-            try:
-                r = rose.process_one(sample, model, processor, pool,
-                                     clip_model=clip_model,
-                                     clip_processor=clip_processor)
-            except Exception as exc:
-                import traceback
-                traceback.print_exc()
-                r = {"id": qid, "question": sample.get("question", ""),
-                     "question_type": sample.get("question_type", "factoid"),
-                     "ground_truth": sample.get("answer", ""),
-                     "prediction": "ERROR", "is_correct": False,
-                     "error": str(exc), "method": "error"}
-            r["latency_s"] = round(time.time() - t0, 2)
-            r["model_key"] = model_key
-            r["routing"] = {k: dec[qid][k] for k in ("model", "scores") if k in dec[qid]}
-            results.append(r)
-            done.add(qid)
-            answered += 1
-            ckpt.write_text(json.dumps(results, indent=2))
-
-            mark = "✓" if r.get("is_correct") else "✗"
-            print(f"[{len(done):03d}/{len(data)}] {mark} {model_key} "
-                  f"pool={pool.size():<3} {r['latency_s']:6.1f}s "
-                  f"pred={str(r.get('prediction'))[:28]}", flush=True)
-
-        rose.MAX_NEW_TOKENS = base_tokens
-        _free_gpu(model, processor)
+            m = dec[str(sample.get("id"))]["model"]
+            _answer(sample, m, *loaded[m])
+        for m, (model, processor) in loaded.items():
+            _free_gpu(model, processor)
+    else:
+        # ── grouped: cheapest model first, one VLM on the GPU at a time ──
+        for model_key in order:
+            if out_of_time:
+                break
+            share = [s for s in pending
+                     if dec[str(s.get("id"))]["model"] == model_key]
+            if not share:
+                continue
+            print(f"\n━━ {model_key}: {len(share)} question(s) ━━")
+            model, processor, revision = load_vlm(model_key, quant=quant)
+            revisions[model_key] = revision
+            for sample in share:
+                if _budget_up():
+                    out_of_time = True
+                    break
+                _answer(sample, model_key, model, processor)
+            _free_gpu(model, processor)
 
     out_path.write_text(json.dumps(results, indent=2))
 
@@ -257,6 +312,7 @@ def run_routed(dataset_path, decisions, out_path,
         "n":              len(results),
         "n_total":        len(data),
         "complete":       len(done) >= len(data),
+        "interleave":     interleave,
         "accuracy_run":   round(acc, 2),
         "mean_latency_s": round(sum(lat) / len(lat), 2) if lat else None,
         "mean_params_b":  round(sum(params) / len(params), 2) if params else None,

@@ -141,6 +141,9 @@ def test_route_then_run_groups_and_budgets():
         # one load per model that got routed questions, cheapest first
         loads = [m for op, m in log if op == "load"]
         assert loads == [m for m in ["gemma3-4b", "qwen2.5-vl-7b"] if m in loads]
+        # interleave (the default): answered in DATASET order, models alternating
+        answered = [i for op, i in log if op == "answer"]
+        assert answered == [r["id"] for r in records]
         # every result carries its routing decision and model
         for r in results:
             assert r["model_key"] == dec["decisions"][r["id"]]["model"]
@@ -151,7 +154,35 @@ def test_route_then_run_groups_and_budgets():
         assert meta["n"] == 6 and meta["accuracy_run"] == 100.0
         assert meta["per_model"]["gemma3-4b"]["n"] == 3
         assert meta["per_model"]["qwen2.5-vl-7b"]["n"] == 3
-        print("✓ route→run grouping, decisions on rows, meta")
+        print("✓ route→run interleaved in dataset order, decisions on rows, meta")
+
+
+def test_grouped_mode_matches_interleaved():
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        pool_path = _pool_file(tmp)
+        data_path = _dataset(tmp, n=6)
+        records = json.loads(data_path.read_text())
+        dec = route_dataset(pool_path, records, embed_fn=fake_embed)
+
+        log = []
+        saved, embedder = _install_mocks(log)
+        try:
+            results = run_routed(data_path, dec, tmp / "grouped.json",
+                                 embedder=embedder, interleave=False)
+        finally:
+            _restore(saved)
+
+        # grouped: gemma's whole share first, then the 7B's
+        answered = [i for op, i in log if op == "answer"]
+        models = [dec["decisions"][i]["model"] for i in answered]
+        switch = models.index("qwen2.5-vl-7b")
+        assert all(m == "gemma3-4b" for m in models[:switch])
+        assert all(m == "qwen2.5-vl-7b" for m in models[switch:])
+        # same (id → model) assignment as interleaved — identical predictions
+        assert {r["id"]: r["model_key"] for r in results} \
+               == {i: dec["decisions"][i]["model"] for i in answered}
+        print("✓ grouped mode: same assignments, different execution order")
 
 
 def test_resume_skips_answered():
@@ -230,6 +261,7 @@ def test_missing_decision_raises():
 
 if __name__ == "__main__":
     test_route_then_run_groups_and_budgets()
+    test_grouped_mode_matches_interleaved()
     test_resume_skips_answered()
     test_session_budget_stops_cleanly_and_resumes()
     test_missing_decision_raises()
