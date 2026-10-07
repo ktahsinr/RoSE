@@ -179,6 +179,34 @@ def test_resume_skips_answered():
         print("✓ checkpoint resume: dry-run answers kept, not redone")
 
 
+def test_session_budget_stops_cleanly_and_resumes():
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        pool_path = _pool_file(tmp)
+        data_path = _dataset(tmp, n=4)
+        records = json.loads(data_path.read_text())
+        dec = route_dataset(pool_path, records, embed_fn=fake_embed)
+
+        log = []
+        saved, embedder = _install_mocks(log)
+        try:
+            out = tmp / "routed.json"
+            # budget 0: stops before the first question, but still writes outputs
+            run_routed(data_path, dec, out, embedder=embedder, stop_after_s=0)
+            assert out.exists()
+            meta = json.loads((tmp / "routed_meta.json").read_text())
+            assert meta["complete"] is False and meta["n"] == 0
+            # next "session": no budget → finishes everything
+            results = run_routed(data_path, dec, out, embedder=embedder)
+        finally:
+            _restore(saved)
+
+        assert len(results) == 4
+        meta = json.loads((tmp / "routed_meta.json").read_text())
+        assert meta["complete"] is True
+        print("✓ session budget: clean stop, outputs written, resume completes")
+
+
 def test_missing_decision_raises():
     with tempfile.TemporaryDirectory() as td:
         tmp = Path(td)
@@ -203,5 +231,6 @@ def test_missing_decision_raises():
 if __name__ == "__main__":
     test_route_then_run_groups_and_budgets()
     test_resume_skips_answered()
+    test_session_budget_stops_cleanly_and_resumes()
     test_missing_decision_raises()
     print("\nall routed-runner tests passed")

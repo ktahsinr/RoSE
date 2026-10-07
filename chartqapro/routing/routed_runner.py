@@ -122,17 +122,24 @@ def _free_gpu(*objs):
 
 def run_routed(dataset_path, decisions, out_path,
                quant: str = "nf4", order=None, token_budget=None,
-               embedder=None, limit=None):
+               embedder=None, limit=None, stop_after_s=None):
     """
     GPU step: answer every question with its routed model via RoSE.
 
-    decisions : dict from route_dataset (or a path to its JSON).
-    limit     : dry run — only the first N dataset records overall.
+    decisions    : dict from route_dataset (or a path to its JSON).
+    limit        : dry run — only the first N dataset records overall.
+    stop_after_s : graceful session budget. After this many seconds the
+                   run stops BETWEEN questions, writes its outputs, and
+                   returns — so a Kaggle "Save & Run All" version
+                   finishes inside the session cap and PUBLISHES the
+                   checkpoint instead of being killed with nothing.
+                   Resume the next session via the checkpoint.
 
     Models are processed in ESCALATION_ORDER; each is loaded once,
     answers its routed share (streaming its own experience pool), and
     is freed before the next loads.
     """
+    t_start = time.time()
     out_path = Path(out_path)
     ckpt = out_path.with_name(out_path.stem + "_checkpoint.json")
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -173,8 +180,11 @@ def run_routed(dataset_path, decisions, out_path,
     base_tokens = rose.MAX_NEW_TOKENS
     revisions = {}
     answered = 0
+    out_of_time = False
 
     for model_key in order:
+        if out_of_time:
+            break
         share = [s for s in by_model.get(model_key, [])
                  if str(s.get("id")) not in done]
         if not share:
@@ -200,6 +210,12 @@ def run_routed(dataset_path, decisions, out_path,
                      clip_emb=None)
 
         for sample in share:
+            if stop_after_s is not None and time.time() - t_start > stop_after_s:
+                out_of_time = True
+                print(f"⏱  session budget ({stop_after_s / 3600:.1f} h) reached — "
+                      f"stopping cleanly with {len(done)}/{len(data)} answered; "
+                      "resume the next session from the checkpoint")
+                break
             qid = str(sample.get("id"))
             t0 = time.time()
             try:
@@ -239,6 +255,8 @@ def run_routed(dataset_path, decisions, out_path,
     meta = {
         "dataset":        str(dataset_path),
         "n":              len(results),
+        "n_total":        len(data),
+        "complete":       len(done) >= len(data),
         "accuracy_run":   round(acc, 2),
         "mean_latency_s": round(sum(lat) / len(lat), 2) if lat else None,
         "mean_params_b":  round(sum(params) / len(params), 2) if params else None,
