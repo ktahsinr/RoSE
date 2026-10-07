@@ -1,0 +1,2604 @@
+{
+  "n": 150,
+  "k": 5,
+  "tau": 0.6,
+  "models": [
+    "gemma3-4b",
+    "qwen3.5-4b",
+    "qwen2.5-vl-7b"
+  ],
+  "per_model": {
+    "gemma3-4b": {
+      "accuracy": 0.22666666666666666,
+      "n": 150,
+      "mean_latency_s": 111.22273333333334,
+      "params_b": 4.3
+    },
+    "qwen3.5-4b": {
+      "accuracy": 0.08666666666666667,
+      "n": 150,
+      "mean_latency_s": 189.41459999999998,
+      "params_b": 4.0
+    },
+    "qwen2.5-vl-7b": {
+      "accuracy": 0.36666666666666664,
+      "n": 150,
+      "mean_latency_s": null,
+      "params_b": 8.3
+    }
+  },
+  "routing": {
+    "accuracy": 0.36,
+    "share": {
+      "gemma3-4b": 0.04666666666666667,
+      "qwen3.5-4b": 0.006666666666666667,
+      "qwen2.5-vl-7b": 0.9466666666666667
+    },
+    "mean_params_b": 8.084666666666644,
+    "accuracy_on_routed": {
+      "gemma3-4b": 0.42857142857142855,
+      "qwen3.5-4b": 0.0,
+      "qwen2.5-vl-7b": 0.3591549295774648
+    }
+  },
+  "always_7b": {
+    "accuracy": 0.36666666666666664,
+    "mean_params_b": 8.3
+  },
+  "oracle": {
+    "accuracy": 0.42,
+    "mean_params_b": 7.207333333333316
+  },
+  "decisions": [
+    {
+      "id": "factoid-00032",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.4091,
+        "qwen3.5-4b": 0.1915,
+        "qwen2.5-vl-7b": 0.1915
+      },
+      "neighbours": [
+        "factoid-00010",
+        "factoid-00421",
+        "factoid-00530",
+        "factoid-00403",
+        "factoid-00527"
+      ]
+    },
+    {
+      "id": "factoid-00374",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.2181
+      },
+      "neighbours": [
+        "factoid-00397",
+        "factoid-00272",
+        "factoid-00177",
+        "factoid-00197",
+        "factoid-00183"
+      ]
+    },
+    {
+      "id": "factoid-00527",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.2163,
+        "qwen2.5-vl-7b": 0.4101
+      },
+      "neighbours": [
+        "factoid-00482",
+        "factoid-00530",
+        "factoid-00207",
+        "factoid-00102",
+        "factoid-00272"
+      ]
+    },
+    {
+      "id": "factoid-00263",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.189,
+        "qwen3.5-4b": 0.372,
+        "qwen2.5-vl-7b": 0.5984
+      },
+      "neighbours": [
+        "factoid-00153",
+        "factoid-00446",
+        "factoid-00311",
+        "factoid-00151",
+        "factoid-00482"
+      ]
+    },
+    {
+      "id": "factoid-00400",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.1892
+      },
+      "neighbours": [
+        "factoid-00282",
+        "factoid-00510",
+        "factoid-00265",
+        "factoid-00529",
+        "factoid-00150"
+      ]
+    },
+    {
+      "id": "factoid-00029",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.0
+      },
+      "neighbours": [
+        "factoid-00023",
+        "factoid-00182",
+        "factoid-00517",
+        "factoid-00480",
+        "factoid-00382"
+      ]
+    },
+    {
+      "id": "factoid-00272",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.2182,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.2162
+      },
+      "neighbours": [
+        "factoid-00374",
+        "factoid-00397",
+        "factoid-00197",
+        "factoid-00177",
+        "factoid-00183"
+      ]
+    },
+    {
+      "id": "factoid-00023",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.0
+      },
+      "neighbours": [
+        "factoid-00029",
+        "factoid-00517",
+        "factoid-00182",
+        "factoid-00483",
+        "factoid-00480"
+      ]
+    },
+    {
+      "id": "factoid-00399",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.2283,
+        "qwen2.5-vl-7b": 0.2283
+      },
+      "neighbours": [
+        "factoid-00149",
+        "factoid-00207",
+        "factoid-00082",
+        "factoid-00324",
+        "factoid-00438"
+      ]
+    },
+    {
+      "id": "factoid-00111",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.4061,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.1881
+      },
+      "neighbours": [
+        "factoid-00127",
+        "factoid-00284",
+        "factoid-00019",
+        "factoid-00164",
+        "factoid-00058"
+      ]
+    },
+    {
+      "id": "factoid-00188",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.1975,
+        "qwen2.5-vl-7b": 0.4052
+      },
+      "neighbours": [
+        "factoid-00228",
+        "factoid-00337",
+        "factoid-00335",
+        "factoid-00162",
+        "factoid-00239"
+      ]
+    },
+    {
+      "id": "factoid-00523",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.1911,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.1911
+      },
+      "neighbours": [
+        "factoid-00294",
+        "factoid-00354",
+        "factoid-00491",
+        "factoid-00037",
+        "factoid-00067"
+      ]
+    },
+    {
+      "id": "factoid-00456",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.1962,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.21
+      },
+      "neighbours": [
+        "factoid-00240",
+        "factoid-00335",
+        "factoid-00272",
+        "factoid-00127",
+        "factoid-00513"
+      ]
+    },
+    {
+      "id": "factoid-00282",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.6033
+      },
+      "neighbours": [
+        "factoid-00400",
+        "factoid-00529",
+        "factoid-00121",
+        "factoid-00240",
+        "factoid-00265"
+      ]
+    },
+    {
+      "id": "factoid-00313",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.3992,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.3992
+      },
+      "neighbours": [
+        "factoid-00142",
+        "factoid-00408",
+        "factoid-00062",
+        "factoid-00098",
+        "factoid-00251"
+      ]
+    },
+    {
+      "id": "factoid-00120",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.3976,
+        "qwen3.5-4b": 0.1924,
+        "qwen2.5-vl-7b": 0.3976
+      },
+      "neighbours": [
+        "factoid-00212",
+        "factoid-00451",
+        "factoid-00024",
+        "factoid-00311",
+        "factoid-00123"
+      ]
+    },
+    {
+      "id": "factoid-00438",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.3994,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.4147
+      },
+      "neighbours": [
+        "factoid-00239",
+        "factoid-00193",
+        "factoid-00513",
+        "factoid-00374",
+        "factoid-00328"
+      ]
+    },
+    {
+      "id": "factoid-00151",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.3886,
+        "qwen3.5-4b": 0.1872,
+        "qwen2.5-vl-7b": 0.7952
+      },
+      "neighbours": [
+        "factoid-00153",
+        "factoid-00263",
+        "factoid-00446",
+        "factoid-00482",
+        "factoid-00193"
+      ]
+    },
+    {
+      "id": "factoid-00107",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.2133,
+        "qwen3.5-4b": 0.2133,
+        "qwen2.5-vl-7b": 0.6092
+      },
+      "neighbours": [
+        "factoid-00403",
+        "factoid-00228",
+        "factoid-00337",
+        "factoid-00178",
+        "factoid-00392"
+      ]
+    },
+    {
+      "id": "factoid-00284",
+      "model": "gemma3-4b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.6016,
+        "qwen3.5-4b": 0.2041,
+        "qwen2.5-vl-7b": 0.6043
+      },
+      "neighbours": [
+        "factoid-00312",
+        "factoid-00240",
+        "factoid-00429",
+        "factoid-00280",
+        "factoid-00282"
+      ]
+    },
+    {
+      "id": "factoid-00019",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.2
+      },
+      "neighbours": [
+        "factoid-00095",
+        "factoid-00483",
+        "factoid-00397",
+        "factoid-00525",
+        "factoid-00088"
+      ]
+    },
+    {
+      "id": "factoid-00382",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.1871
+      },
+      "neighbours": [
+        "factoid-00441",
+        "factoid-00182",
+        "factoid-00448",
+        "factoid-00292",
+        "factoid-00228"
+      ]
+    },
+    {
+      "id": "factoid-00003",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.1948,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.4084
+      },
+      "neighbours": [
+        "factoid-00397",
+        "factoid-00449",
+        "factoid-00517",
+        "factoid-00197",
+        "factoid-00086"
+      ]
+    },
+    {
+      "id": "factoid-00058",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.2155,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.3861
+      },
+      "neighbours": [
+        "factoid-00374",
+        "factoid-00233",
+        "factoid-00272",
+        "factoid-00397",
+        "factoid-00239"
+      ]
+    },
+    {
+      "id": "factoid-00088",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.0
+      },
+      "neighbours": [
+        "factoid-00451",
+        "factoid-00021",
+        "factoid-00517",
+        "factoid-00019",
+        "factoid-00483"
+      ]
+    },
+    {
+      "id": "factoid-00324",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.4032,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.4032
+      },
+      "neighbours": [
+        "factoid-00209",
+        "factoid-00103",
+        "factoid-00207",
+        "factoid-00109",
+        "factoid-00364"
+      ]
+    },
+    {
+      "id": "factoid-00193",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.1939,
+        "qwen3.5-4b": 0.1925,
+        "qwen2.5-vl-7b": 0.5982
+      },
+      "neighbours": [
+        "factoid-00239",
+        "factoid-00438",
+        "factoid-00374",
+        "factoid-00482",
+        "factoid-00397"
+      ]
+    },
+    {
+      "id": "factoid-00449",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.2058,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.2058
+      },
+      "neighbours": [
+        "factoid-00441",
+        "factoid-00003",
+        "factoid-00182",
+        "factoid-00517",
+        "factoid-00382"
+      ]
+    },
+    {
+      "id": "factoid-00484",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.0
+      },
+      "neighbours": [
+        "factoid-00440",
+        "factoid-00041",
+        "factoid-00525",
+        "factoid-00336",
+        "factoid-00197"
+      ]
+    },
+    {
+      "id": "factoid-00131",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.6214
+      },
+      "neighbours": [
+        "factoid-00121",
+        "factoid-00341",
+        "factoid-00240",
+        "factoid-00282",
+        "factoid-00202"
+      ]
+    },
+    {
+      "id": "factoid-00446",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.3919,
+        "qwen3.5-4b": 0.3841,
+        "qwen2.5-vl-7b": 0.8157
+      },
+      "neighbours": [
+        "factoid-00153",
+        "factoid-00263",
+        "factoid-00482",
+        "factoid-00151",
+        "factoid-00303"
+      ]
+    },
+    {
+      "id": "factoid-00292",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.6001
+      },
+      "neighbours": [
+        "factoid-00392",
+        "factoid-00441",
+        "factoid-00228",
+        "factoid-00382",
+        "factoid-00107"
+      ]
+    },
+    {
+      "id": "factoid-00164",
+      "model": "gemma3-4b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.6065,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.6211
+      },
+      "neighbours": [
+        "factoid-00073",
+        "factoid-00121",
+        "factoid-00067",
+        "factoid-00010",
+        "factoid-00529"
+      ]
+    },
+    {
+      "id": "factoid-00294",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.1979,
+        "qwen2.5-vl-7b": 0.4191
+      },
+      "neighbours": [
+        "factoid-00523",
+        "factoid-00422",
+        "factoid-00176",
+        "factoid-00240",
+        "factoid-00529"
+      ]
+    },
+    {
+      "id": "factoid-00432",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.2115,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.4129
+      },
+      "neighbours": [
+        "factoid-00103",
+        "factoid-00460",
+        "factoid-00209",
+        "factoid-00207",
+        "factoid-00200"
+      ]
+    },
+    {
+      "id": "factoid-00157",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.1939,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.8143
+      },
+      "neighbours": [
+        "factoid-00150",
+        "factoid-00153",
+        "factoid-00263",
+        "factoid-00311",
+        "factoid-00341"
+      ]
+    },
+    {
+      "id": "factoid-00145",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.3989,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.3989
+      },
+      "neighbours": [
+        "factoid-00209",
+        "factoid-00207",
+        "factoid-00103",
+        "factoid-00109",
+        "factoid-00324"
+      ]
+    },
+    {
+      "id": "factoid-00102",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.1969,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.1983
+      },
+      "neighbours": [
+        "factoid-00272",
+        "factoid-00337",
+        "factoid-00527",
+        "factoid-00397",
+        "factoid-00374"
+      ]
+    },
+    {
+      "id": "factoid-00336",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.0
+      },
+      "neighbours": [
+        "factoid-00440",
+        "factoid-00041",
+        "factoid-00334",
+        "factoid-00265",
+        "factoid-00021"
+      ]
+    },
+    {
+      "id": "factoid-00402",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.1852
+      },
+      "neighbours": [
+        "factoid-00328",
+        "factoid-00178",
+        "factoid-00182",
+        "factoid-00451",
+        "factoid-00228"
+      ]
+    },
+    {
+      "id": "factoid-00451",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.1908,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.194
+      },
+      "neighbours": [
+        "factoid-00088",
+        "factoid-00328",
+        "factoid-00397",
+        "factoid-00402",
+        "factoid-00374"
+      ]
+    },
+    {
+      "id": "factoid-00178",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.4295
+      },
+      "neighbours": [
+        "factoid-00228",
+        "factoid-00392",
+        "factoid-00098",
+        "factoid-00335",
+        "factoid-00337"
+      ]
+    },
+    {
+      "id": "factoid-00239",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.2068,
+        "qwen3.5-4b": 0.1891,
+        "qwen2.5-vl-7b": 0.3959
+      },
+      "neighbours": [
+        "factoid-00193",
+        "factoid-00438",
+        "factoid-00513",
+        "factoid-00183",
+        "factoid-00482"
+      ]
+    },
+    {
+      "id": "factoid-00227",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.208,
+        "qwen3.5-4b": 0.1995,
+        "qwen2.5-vl-7b": 0.5968
+      },
+      "neighbours": [
+        "factoid-00425",
+        "factoid-00240",
+        "factoid-00175",
+        "factoid-00311",
+        "factoid-00341"
+      ]
+    },
+    {
+      "id": "factoid-00182",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.0
+      },
+      "neighbours": [
+        "factoid-00029",
+        "factoid-00023",
+        "factoid-00382",
+        "factoid-00480",
+        "factoid-00449"
+      ]
+    },
+    {
+      "id": "factoid-00000",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.0
+      },
+      "neighbours": [
+        "factoid-00182",
+        "factoid-00529",
+        "factoid-00491",
+        "factoid-00438",
+        "factoid-00399"
+      ]
+    },
+    {
+      "id": "factoid-00516",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.2097,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.2097
+      },
+      "neighbours": [
+        "factoid-00103",
+        "factoid-00176",
+        "factoid-00529",
+        "factoid-00513",
+        "factoid-00265"
+      ]
+    },
+    {
+      "id": "factoid-00225",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.2001,
+        "qwen3.5-4b": 0.4106,
+        "qwen2.5-vl-7b": 0.2001
+      },
+      "neighbours": [
+        "factoid-00162",
+        "factoid-00403",
+        "factoid-00513",
+        "factoid-00337",
+        "factoid-00272"
+      ]
+    },
+    {
+      "id": "factoid-00394",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.1996,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.1973
+      },
+      "neighbours": [
+        "factoid-00335",
+        "factoid-00328",
+        "factoid-00374",
+        "factoid-00397",
+        "factoid-00311"
+      ]
+    },
+    {
+      "id": "factoid-00265",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.1978
+      },
+      "neighbours": [
+        "factoid-00282",
+        "factoid-00041",
+        "factoid-00336",
+        "factoid-00121",
+        "factoid-00131"
+      ]
+    },
+    {
+      "id": "factoid-00194",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.2246,
+        "qwen3.5-4b": 0.2246,
+        "qwen2.5-vl-7b": 0.418
+      },
+      "neighbours": [
+        "factoid-00124",
+        "factoid-00328",
+        "factoid-00421",
+        "factoid-00205",
+        "factoid-00446"
+      ]
+    },
+    {
+      "id": "factoid-00501",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.2085,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.2085
+      },
+      "neighbours": [
+        "factoid-00197",
+        "factoid-00058",
+        "factoid-00527",
+        "factoid-00484",
+        "factoid-00337"
+      ]
+    },
+    {
+      "id": "factoid-00021",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.1948,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.0
+      },
+      "neighbours": [
+        "factoid-00088",
+        "factoid-00336",
+        "factoid-00440",
+        "factoid-00334",
+        "factoid-00419"
+      ]
+    },
+    {
+      "id": "factoid-00139",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.3962,
+        "qwen3.5-4b": 0.1923,
+        "qwen2.5-vl-7b": 0.6198
+      },
+      "neighbours": [
+        "factoid-00341",
+        "factoid-00086",
+        "factoid-00095",
+        "factoid-00403",
+        "factoid-00220"
+      ]
+    },
+    {
+      "id": "factoid-00341",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.1878,
+        "qwen3.5-4b": 0.1878,
+        "qwen2.5-vl-7b": 0.5908
+      },
+      "neighbours": [
+        "factoid-00131",
+        "factoid-00121",
+        "factoid-00202",
+        "factoid-00240",
+        "factoid-00312"
+      ]
+    },
+    {
+      "id": "factoid-00113",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.1951
+      },
+      "neighbours": [
+        "factoid-00294",
+        "factoid-00527",
+        "factoid-00523",
+        "factoid-00328",
+        "factoid-00354"
+      ]
+    },
+    {
+      "id": "factoid-00480",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.0
+      },
+      "neighbours": [
+        "factoid-00041",
+        "factoid-00529",
+        "factoid-00182",
+        "factoid-00282",
+        "factoid-00334"
+      ]
+    },
+    {
+      "id": "factoid-00010",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.1977,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.3909
+      },
+      "neighbours": [
+        "factoid-00421",
+        "factoid-00480",
+        "factoid-00164",
+        "factoid-00073",
+        "factoid-00121"
+      ]
+    },
+    {
+      "id": "factoid-00429",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.1944,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.6039
+      },
+      "neighbours": [
+        "factoid-00460",
+        "factoid-00282",
+        "factoid-00529",
+        "factoid-00400",
+        "factoid-00058"
+      ]
+    },
+    {
+      "id": "factoid-00212",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.2226,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.2226
+      },
+      "neighbours": [
+        "factoid-00142",
+        "factoid-00335",
+        "factoid-00328",
+        "factoid-00337",
+        "factoid-00311"
+      ]
+    },
+    {
+      "id": "factoid-00369",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.1944,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.8096
+      },
+      "neighbours": [
+        "factoid-00194",
+        "factoid-00523",
+        "factoid-00516",
+        "factoid-00153",
+        "factoid-00173"
+      ]
+    },
+    {
+      "id": "factoid-00084",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.2086,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.2086
+      },
+      "neighbours": [
+        "factoid-00086",
+        "factoid-00449",
+        "factoid-00517",
+        "factoid-00441",
+        "factoid-00088"
+      ]
+    },
+    {
+      "id": "factoid-00086",
+      "model": "gemma3-4b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.6014,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.7914
+      },
+      "neighbours": [
+        "factoid-00037",
+        "factoid-00003",
+        "factoid-00008",
+        "factoid-00067",
+        "factoid-00397"
+      ]
+    },
+    {
+      "id": "factoid-00311",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.2097,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.8042
+      },
+      "neighbours": [
+        "factoid-00263",
+        "factoid-00153",
+        "factoid-00282",
+        "factoid-00400",
+        "factoid-00378"
+      ]
+    },
+    {
+      "id": "factoid-00258",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.202,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.3948
+      },
+      "neighbours": [
+        "factoid-00282",
+        "factoid-00026",
+        "factoid-00265",
+        "factoid-00529",
+        "factoid-00400"
+      ]
+    },
+    {
+      "id": "factoid-00525",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.0
+      },
+      "neighbours": [
+        "factoid-00440",
+        "factoid-00041",
+        "factoid-00484",
+        "factoid-00019",
+        "factoid-00483"
+      ]
+    },
+    {
+      "id": "factoid-00440",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.0
+      },
+      "neighbours": [
+        "factoid-00484",
+        "factoid-00041",
+        "factoid-00336",
+        "factoid-00525",
+        "factoid-00334"
+      ]
+    },
+    {
+      "id": "factoid-00419",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.0
+      },
+      "neighbours": [
+        "factoid-00334",
+        "factoid-00265",
+        "factoid-00021",
+        "factoid-00041",
+        "factoid-00336"
+      ]
+    },
+    {
+      "id": "factoid-00075",
+      "model": "gemma3-4b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.6021,
+        "qwen3.5-4b": 0.2018,
+        "qwen2.5-vl-7b": 0.6021
+      },
+      "neighbours": [
+        "factoid-00067",
+        "factoid-00162",
+        "factoid-00008",
+        "factoid-00072",
+        "factoid-00516"
+      ]
+    },
+    {
+      "id": "factoid-00049",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.1954,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.3848
+      },
+      "neighbours": [
+        "factoid-00209",
+        "factoid-00324",
+        "factoid-00207",
+        "factoid-00103",
+        "factoid-00102"
+      ]
+    },
+    {
+      "id": "factoid-00109",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.1978,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.1978
+      },
+      "neighbours": [
+        "factoid-00324",
+        "factoid-00209",
+        "factoid-00103",
+        "factoid-00145",
+        "factoid-00364"
+      ]
+    },
+    {
+      "id": "factoid-00048",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.1823,
+        "qwen3.5-4b": 0.1823,
+        "qwen2.5-vl-7b": 0.6291
+      },
+      "neighbours": [
+        "factoid-00259",
+        "factoid-00240",
+        "factoid-00265",
+        "factoid-00312",
+        "factoid-00131"
+      ]
+    },
+    {
+      "id": "factoid-00041",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.0
+      },
+      "neighbours": [
+        "factoid-00440",
+        "factoid-00336",
+        "factoid-00484",
+        "factoid-00334",
+        "factoid-00525"
+      ]
+    },
+    {
+      "id": "factoid-00303",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.1955,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.5837
+      },
+      "neighbours": [
+        "factoid-00233",
+        "factoid-00446",
+        "factoid-00378",
+        "factoid-00263",
+        "factoid-00194"
+      ]
+    },
+    {
+      "id": "factoid-00280",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.1965,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.3914
+      },
+      "neighbours": [
+        "factoid-00513",
+        "factoid-00284",
+        "factoid-00202",
+        "factoid-00058",
+        "factoid-00400"
+      ]
+    },
+    {
+      "id": "factoid-00209",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.3972,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.3972
+      },
+      "neighbours": [
+        "factoid-00324",
+        "factoid-00103",
+        "factoid-00207",
+        "factoid-00109",
+        "factoid-00145"
+      ]
+    },
+    {
+      "id": "factoid-00529",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.1865,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.1878
+      },
+      "neighbours": [
+        "factoid-00282",
+        "factoid-00513",
+        "factoid-00480",
+        "factoid-00400",
+        "factoid-00429"
+      ]
+    },
+    {
+      "id": "factoid-00334",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.1926,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.0
+      },
+      "neighbours": [
+        "factoid-00336",
+        "factoid-00041",
+        "factoid-00440",
+        "factoid-00419",
+        "factoid-00480"
+      ]
+    },
+    {
+      "id": "factoid-00082",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.2011,
+        "qwen3.5-4b": 0.215,
+        "qwen2.5-vl-7b": 0.4161
+      },
+      "neighbours": [
+        "factoid-00149",
+        "factoid-00103",
+        "factoid-00399",
+        "factoid-00209",
+        "factoid-00200"
+      ]
+    },
+    {
+      "id": "factoid-00073",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.1881,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.1922
+      },
+      "neighbours": [
+        "factoid-00164",
+        "factoid-00529",
+        "factoid-00121",
+        "factoid-00421",
+        "factoid-00010"
+      ]
+    },
+    {
+      "id": "factoid-00106",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.5961,
+        "qwen3.5-4b": 0.1984,
+        "qwen2.5-vl-7b": 0.198
+      },
+      "neighbours": [
+        "factoid-00282",
+        "factoid-00419",
+        "factoid-00162",
+        "factoid-00516",
+        "factoid-00425"
+      ]
+    },
+    {
+      "id": "factoid-00197",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.3899,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.3888
+      },
+      "neighbours": [
+        "factoid-00272",
+        "factoid-00374",
+        "factoid-00397",
+        "factoid-00177",
+        "factoid-00003"
+      ]
+    },
+    {
+      "id": "factoid-00504",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.4158,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.3939
+      },
+      "neighbours": [
+        "factoid-00127",
+        "factoid-00429",
+        "factoid-00121",
+        "factoid-00341",
+        "factoid-00048"
+      ]
+    },
+    {
+      "id": "factoid-00162",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.2012,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.4013
+      },
+      "neighbours": [
+        "factoid-00205",
+        "factoid-00225",
+        "factoid-00374",
+        "factoid-00397",
+        "factoid-00178"
+      ]
+    },
+    {
+      "id": "factoid-00530",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.199,
+        "qwen3.5-4b": 0.199,
+        "qwen2.5-vl-7b": 0.5889
+      },
+      "neighbours": [
+        "factoid-00527",
+        "factoid-00403",
+        "factoid-00397",
+        "factoid-00102",
+        "factoid-00272"
+      ]
+    },
+    {
+      "id": "factoid-00150",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.1896,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.5944
+      },
+      "neighbours": [
+        "factoid-00157",
+        "factoid-00400",
+        "factoid-00153",
+        "factoid-00263",
+        "factoid-00510"
+      ]
+    },
+    {
+      "id": "factoid-00127",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.2031
+      },
+      "neighbours": [
+        "factoid-00231",
+        "factoid-00131",
+        "factoid-00121",
+        "factoid-00513",
+        "factoid-00504"
+      ]
+    },
+    {
+      "id": "factoid-00268",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.4042
+      },
+      "neighbours": [
+        "factoid-00205",
+        "factoid-00441",
+        "factoid-00513",
+        "factoid-00448",
+        "factoid-00102"
+      ]
+    },
+    {
+      "id": "factoid-00505",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.3948,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.429
+      },
+      "neighbours": [
+        "factoid-00205",
+        "factoid-00142",
+        "factoid-00127",
+        "factoid-00441",
+        "factoid-00178"
+      ]
+    },
+    {
+      "id": "factoid-00173",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.3942,
+        "qwen3.5-4b": 0.1971,
+        "qwen2.5-vl-7b": 0.4046
+      },
+      "neighbours": [
+        "factoid-00460",
+        "factoid-00176",
+        "factoid-00425",
+        "factoid-00162",
+        "factoid-00516"
+      ]
+    },
+    {
+      "id": "factoid-00067",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.4267,
+        "qwen3.5-4b": 0.1884,
+        "qwen2.5-vl-7b": 0.615
+      },
+      "neighbours": [
+        "factoid-00008",
+        "factoid-00086",
+        "factoid-00072",
+        "factoid-00491",
+        "factoid-00482"
+      ]
+    },
+    {
+      "id": "factoid-00335",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.4118
+      },
+      "neighbours": [
+        "factoid-00228",
+        "factoid-00328",
+        "factoid-00178",
+        "factoid-00392",
+        "factoid-00272"
+      ]
+    },
+    {
+      "id": "factoid-00482",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.5787
+      },
+      "neighbours": [
+        "factoid-00527",
+        "factoid-00446",
+        "factoid-00397",
+        "factoid-00239",
+        "factoid-00153"
+      ]
+    },
+    {
+      "id": "factoid-00205",
+      "model": "qwen3.5-4b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.1894,
+        "qwen3.5-4b": 0.6077,
+        "qwen2.5-vl-7b": 0.3932
+      },
+      "neighbours": [
+        "factoid-00162",
+        "factoid-00178",
+        "factoid-00268",
+        "factoid-00482",
+        "factoid-00374"
+      ]
+    },
+    {
+      "id": "factoid-00095",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.0
+      },
+      "neighbours": [
+        "factoid-00483",
+        "factoid-00019",
+        "factoid-00525",
+        "factoid-00088",
+        "factoid-00200"
+      ]
+    },
+    {
+      "id": "factoid-00233",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.206,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.4001
+      },
+      "neighbours": [
+        "factoid-00303",
+        "factoid-00058",
+        "factoid-00088",
+        "factoid-00328",
+        "factoid-00239"
+      ]
+    },
+    {
+      "id": "factoid-00448",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.1936
+      },
+      "neighbours": [
+        "factoid-00272",
+        "factoid-00382",
+        "factoid-00517",
+        "factoid-00197",
+        "factoid-00228"
+      ]
+    },
+    {
+      "id": "factoid-00517",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.1966,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.3932
+      },
+      "neighbours": [
+        "factoid-00023",
+        "factoid-00272",
+        "factoid-00088",
+        "factoid-00003",
+        "factoid-00397"
+      ]
+    },
+    {
+      "id": "factoid-00392",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.4154
+      },
+      "neighbours": [
+        "factoid-00228",
+        "factoid-00178",
+        "factoid-00441",
+        "factoid-00335",
+        "factoid-00107"
+      ]
+    },
+    {
+      "id": "factoid-00200",
+      "model": "gemma3-4b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.6079,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.6079
+      },
+      "neighbours": [
+        "factoid-00414",
+        "factoid-00082",
+        "factoid-00103",
+        "factoid-00145",
+        "factoid-00109"
+      ]
+    },
+    {
+      "id": "factoid-00175",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.1993,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.396
+      },
+      "neighbours": [
+        "factoid-00510",
+        "factoid-00425",
+        "factoid-00153",
+        "factoid-00400",
+        "factoid-00336"
+      ]
+    },
+    {
+      "id": "factoid-00283",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.1985
+      },
+      "neighbours": [
+        "factoid-00183",
+        "factoid-00527",
+        "factoid-00272",
+        "factoid-00197",
+        "factoid-00397"
+      ]
+    },
+    {
+      "id": "factoid-00266",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.2066,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.2024
+      },
+      "neighbours": [
+        "factoid-00010",
+        "factoid-00194",
+        "factoid-00402",
+        "factoid-00328",
+        "factoid-00292"
+      ]
+    },
+    {
+      "id": "factoid-00026",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.3937,
+        "qwen3.5-4b": 0.3906,
+        "qwen2.5-vl-7b": 0.6156
+      },
+      "neighbours": [
+        "factoid-00239",
+        "factoid-00403",
+        "factoid-00258",
+        "factoid-00231",
+        "factoid-00162"
+      ]
+    },
+    {
+      "id": "factoid-00251",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.1975
+      },
+      "neighbours": [
+        "factoid-00313",
+        "factoid-00438",
+        "factoid-00282",
+        "factoid-00513",
+        "factoid-00239"
+      ]
+    },
+    {
+      "id": "factoid-00422",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.1806,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.3698
+      },
+      "neighbours": [
+        "factoid-00294",
+        "factoid-00176",
+        "factoid-00523",
+        "factoid-00460",
+        "factoid-00419"
+      ]
+    },
+    {
+      "id": "factoid-00378",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.193
+      },
+      "neighbours": [
+        "factoid-00303",
+        "factoid-00311",
+        "factoid-00328",
+        "factoid-00446",
+        "factoid-00153"
+      ]
+    },
+    {
+      "id": "factoid-00103",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.1883,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.1883
+      },
+      "neighbours": [
+        "factoid-00209",
+        "factoid-00324",
+        "factoid-00207",
+        "factoid-00109",
+        "factoid-00145"
+      ]
+    },
+    {
+      "id": "factoid-00513",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.1953,
+        "qwen3.5-4b": 0.1953,
+        "qwen2.5-vl-7b": 0.398
+      },
+      "neighbours": [
+        "factoid-00529",
+        "factoid-00239",
+        "factoid-00282",
+        "factoid-00312",
+        "factoid-00438"
+      ]
+    },
+    {
+      "id": "factoid-00337",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.2023,
+        "qwen3.5-4b": 0.2023,
+        "qwen2.5-vl-7b": 0.612
+      },
+      "neighbours": [
+        "factoid-00228",
+        "factoid-00403",
+        "factoid-00107",
+        "factoid-00178",
+        "factoid-00272"
+      ]
+    },
+    {
+      "id": "factoid-00421",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.1991,
+        "qwen3.5-4b": 0.1991,
+        "qwen2.5-vl-7b": 0.4008
+      },
+      "neighbours": [
+        "factoid-00480",
+        "factoid-00194",
+        "factoid-00178",
+        "factoid-00403",
+        "factoid-00513"
+      ]
+    },
+    {
+      "id": "factoid-00312",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.2004
+      },
+      "neighbours": [
+        "factoid-00513",
+        "factoid-00131",
+        "factoid-00341",
+        "factoid-00284",
+        "factoid-00282"
+      ]
+    },
+    {
+      "id": "factoid-00483",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.0
+      },
+      "neighbours": [
+        "factoid-00095",
+        "factoid-00019",
+        "factoid-00023",
+        "factoid-00525",
+        "factoid-00088"
+      ]
+    },
+    {
+      "id": "factoid-00037",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.4073,
+        "qwen3.5-4b": 0.1993,
+        "qwen2.5-vl-7b": 0.4073
+      },
+      "neighbours": [
+        "factoid-00086",
+        "factoid-00182",
+        "factoid-00162",
+        "factoid-00008",
+        "factoid-00041"
+      ]
+    },
+    {
+      "id": "factoid-00491",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.3955,
+        "qwen3.5-4b": 0.1919,
+        "qwen2.5-vl-7b": 0.3955
+      },
+      "neighbours": [
+        "factoid-00209",
+        "factoid-00067",
+        "factoid-00441",
+        "factoid-00324",
+        "factoid-00188"
+      ]
+    },
+    {
+      "id": "factoid-00354",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.3977,
+        "qwen3.5-4b": 0.3977,
+        "qwen2.5-vl-7b": 0.5898
+      },
+      "neighbours": [
+        "factoid-00178",
+        "factoid-00403",
+        "factoid-00062",
+        "factoid-00188",
+        "factoid-00523"
+      ]
+    },
+    {
+      "id": "factoid-00072",
+      "model": "gemma3-4b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.6028,
+        "qwen3.5-4b": 0.1908,
+        "qwen2.5-vl-7b": 0.6028
+      },
+      "neighbours": [
+        "factoid-00067",
+        "factoid-00354",
+        "factoid-00182",
+        "factoid-00403",
+        "factoid-00075"
+      ]
+    },
+    {
+      "id": "factoid-00231",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.2099,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.5853
+      },
+      "neighbours": [
+        "factoid-00127",
+        "factoid-00131",
+        "factoid-00341",
+        "factoid-00121",
+        "factoid-00239"
+      ]
+    },
+    {
+      "id": "factoid-00240",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.399
+      },
+      "neighbours": [
+        "factoid-00131",
+        "factoid-00282",
+        "factoid-00259",
+        "factoid-00121",
+        "factoid-00048"
+      ]
+    },
+    {
+      "id": "factoid-00177",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.2215,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.1985
+      },
+      "neighbours": [
+        "factoid-00374",
+        "factoid-00272",
+        "factoid-00397",
+        "factoid-00197",
+        "factoid-00207"
+      ]
+    },
+    {
+      "id": "factoid-00460",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.4277,
+        "qwen3.5-4b": 0.377,
+        "qwen2.5-vl-7b": 0.3904
+      },
+      "neighbours": [
+        "factoid-00429",
+        "factoid-00103",
+        "factoid-00432",
+        "factoid-00162",
+        "factoid-00149"
+      ]
+    },
+    {
+      "id": "factoid-00228",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.4055
+      },
+      "neighbours": [
+        "factoid-00392",
+        "factoid-00178",
+        "factoid-00335",
+        "factoid-00337",
+        "factoid-00107"
+      ]
+    },
+    {
+      "id": "factoid-00328",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.1963
+      },
+      "neighbours": [
+        "factoid-00402",
+        "factoid-00335",
+        "factoid-00228",
+        "factoid-00178",
+        "factoid-00438"
+      ]
+    },
+    {
+      "id": "factoid-00203",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.3843,
+        "qwen3.5-4b": 0.188,
+        "qwen2.5-vl-7b": 0.3834
+      },
+      "neighbours": [
+        "factoid-00354",
+        "factoid-00419",
+        "factoid-00106",
+        "factoid-00402",
+        "factoid-00403"
+      ]
+    },
+    {
+      "id": "factoid-00176",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.2013,
+        "qwen3.5-4b": 0.2027,
+        "qwen2.5-vl-7b": 0.2013
+      },
+      "neighbours": [
+        "factoid-00422",
+        "factoid-00294",
+        "factoid-00516",
+        "factoid-00421",
+        "factoid-00173"
+      ]
+    },
+    {
+      "id": "factoid-00008",
+      "model": "gemma3-4b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.6235,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.6235
+      },
+      "neighbours": [
+        "factoid-00067",
+        "factoid-00003",
+        "factoid-00086",
+        "factoid-00529",
+        "factoid-00037"
+      ]
+    },
+    {
+      "id": "factoid-00121",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.3968
+      },
+      "neighbours": [
+        "factoid-00131",
+        "factoid-00341",
+        "factoid-00282",
+        "factoid-00240",
+        "factoid-00265"
+      ]
+    },
+    {
+      "id": "factoid-00123",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.197
+      },
+      "neighbours": [
+        "factoid-00178",
+        "factoid-00328",
+        "factoid-00098",
+        "factoid-00402",
+        "factoid-00228"
+      ]
+    },
+    {
+      "id": "factoid-00259",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.4055
+      },
+      "neighbours": [
+        "factoid-00048",
+        "factoid-00240",
+        "factoid-00265",
+        "factoid-00121",
+        "factoid-00131"
+      ]
+    },
+    {
+      "id": "factoid-00183",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.2099,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.4024
+      },
+      "neighbours": [
+        "factoid-00397",
+        "factoid-00374",
+        "factoid-00272",
+        "factoid-00239",
+        "factoid-00283"
+      ]
+    },
+    {
+      "id": "factoid-00397",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.2222,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.1874
+      },
+      "neighbours": [
+        "factoid-00374",
+        "factoid-00272",
+        "factoid-00228",
+        "factoid-00183",
+        "factoid-00197"
+      ]
+    },
+    {
+      "id": "factoid-00062",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.1868,
+        "qwen3.5-4b": 0.1868,
+        "qwen2.5-vl-7b": 0.369
+      },
+      "neighbours": [
+        "factoid-00220",
+        "factoid-00364",
+        "factoid-00403",
+        "factoid-00354",
+        "factoid-00239"
+      ]
+    },
+    {
+      "id": "factoid-00142",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.1949,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.3975
+      },
+      "neighbours": [
+        "factoid-00178",
+        "factoid-00228",
+        "factoid-00337",
+        "factoid-00438",
+        "factoid-00212"
+      ]
+    },
+    {
+      "id": "factoid-00202",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.1932,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.5922
+      },
+      "neighbours": [
+        "factoid-00131",
+        "factoid-00341",
+        "factoid-00484",
+        "factoid-00121",
+        "factoid-00280"
+      ]
+    },
+    {
+      "id": "factoid-00425",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.2056,
+        "qwen2.5-vl-7b": 0.4008
+      },
+      "neighbours": [
+        "factoid-00282",
+        "factoid-00175",
+        "factoid-00024",
+        "factoid-00240",
+        "factoid-00529"
+      ]
+    },
+    {
+      "id": "factoid-00132",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.1981,
+        "qwen3.5-4b": 0.5922,
+        "qwen2.5-vl-7b": 0.7937
+      },
+      "neighbours": [
+        "factoid-00265",
+        "factoid-00102",
+        "factoid-00403",
+        "factoid-00149",
+        "factoid-00175"
+      ]
+    },
+    {
+      "id": "factoid-00001",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.4065,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.4065
+      },
+      "neighbours": [
+        "factoid-00209",
+        "factoid-00103",
+        "factoid-00109",
+        "factoid-00364",
+        "factoid-00324"
+      ]
+    },
+    {
+      "id": "factoid-00403",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.4078
+      },
+      "neighbours": [
+        "factoid-00107",
+        "factoid-00337",
+        "factoid-00178",
+        "factoid-00098",
+        "factoid-00228"
+      ]
+    },
+    {
+      "id": "factoid-00364",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.1971,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.1971
+      },
+      "neighbours": [
+        "factoid-00324",
+        "factoid-00220",
+        "factoid-00209",
+        "factoid-00109",
+        "factoid-00062"
+      ]
+    },
+    {
+      "id": "factoid-00124",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.1807,
+        "qwen3.5-4b": 0.1807,
+        "qwen2.5-vl-7b": 0.4559
+      },
+      "neighbours": [
+        "factoid-00194",
+        "factoid-00176",
+        "factoid-00328",
+        "factoid-00312",
+        "factoid-00131"
+      ]
+    },
+    {
+      "id": "factoid-00098",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.1986,
+        "qwen3.5-4b": 0.1986,
+        "qwen2.5-vl-7b": 0.4017
+      },
+      "neighbours": [
+        "factoid-00178",
+        "factoid-00228",
+        "factoid-00403",
+        "factoid-00337",
+        "factoid-00408"
+      ]
+    },
+    {
+      "id": "factoid-00153",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.4129,
+        "qwen3.5-4b": 0.3744,
+        "qwen2.5-vl-7b": 0.5949
+      },
+      "neighbours": [
+        "factoid-00263",
+        "factoid-00446",
+        "factoid-00151",
+        "factoid-00311",
+        "factoid-00482"
+      ]
+    },
+    {
+      "id": "factoid-00024",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.2215,
+        "qwen3.5-4b": 0.1884,
+        "qwen2.5-vl-7b": 0.3899
+      },
+      "neighbours": [
+        "factoid-00425",
+        "factoid-00194",
+        "factoid-00282",
+        "factoid-00173",
+        "factoid-00175"
+      ]
+    },
+    {
+      "id": "factoid-00149",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.1812,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.1812
+      },
+      "neighbours": [
+        "factoid-00399",
+        "factoid-00082",
+        "factoid-00324",
+        "factoid-00209",
+        "factoid-00103"
+      ]
+    },
+    {
+      "id": "factoid-00220",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.1937,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.1937
+      },
+      "neighbours": [
+        "factoid-00062",
+        "factoid-00364",
+        "factoid-00109",
+        "factoid-00082",
+        "factoid-00233"
+      ]
+    },
+    {
+      "id": "factoid-00207",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.2032,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.2032
+      },
+      "neighbours": [
+        "factoid-00209",
+        "factoid-00324",
+        "factoid-00103",
+        "factoid-00145",
+        "factoid-00399"
+      ]
+    },
+    {
+      "id": "factoid-00510",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.2038,
+        "qwen2.5-vl-7b": 0.4184
+      },
+      "neighbours": [
+        "factoid-00400",
+        "factoid-00175",
+        "factoid-00282",
+        "factoid-00336",
+        "factoid-00440"
+      ]
+    },
+    {
+      "id": "factoid-00441",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.0,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.4077
+      },
+      "neighbours": [
+        "factoid-00228",
+        "factoid-00449",
+        "factoid-00392",
+        "factoid-00382",
+        "factoid-00292"
+      ]
+    },
+    {
+      "id": "factoid-00414",
+      "model": "qwen2.5-vl-7b",
+      "hit": 1,
+      "scores": {
+        "gemma3-4b": 0.2001,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.2001
+      },
+      "neighbours": [
+        "factoid-00200",
+        "factoid-00209",
+        "factoid-00109",
+        "factoid-00324",
+        "factoid-00145"
+      ]
+    },
+    {
+      "id": "factoid-00408",
+      "model": "qwen2.5-vl-7b",
+      "hit": 0,
+      "scores": {
+        "gemma3-4b": 0.1893,
+        "qwen3.5-4b": 0.0,
+        "qwen2.5-vl-7b": 0.3757
+      },
+      "neighbours": [
+        "factoid-00098",
+        "factoid-00178",
+        "factoid-00328",
+        "factoid-00142",
+        "factoid-00228"
+      ]
+    }
+  ]
+}

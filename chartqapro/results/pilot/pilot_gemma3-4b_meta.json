@@ -1,0 +1,36 @@
+{
+  "model_key": "gemma3-4b",
+  "hf_id": "google/gemma-3-4b-it",
+  "revision": "093f9f388b31de276ce2de164bdc2081324b9767",
+  "quant": "nf4",
+  "n": 150,
+  "accuracy_run": 22.67,
+  "mean_latency_s": 111.22,
+  "rose_config": {
+    "m_paths": 5,
+    "k_demonstrations": 3,
+    "lambda": 1.2,
+    "temperature": 0.8,
+    "extensions": {
+      "mcq_permute_options": true,
+      "numeric_vote_clustering": true,
+      "type_aware_retrieval": true,
+      "drop_malformed_paths": true,
+      "greedy_first_path": true,
+      "chart_reading_scaffold": true,
+      "mcq_demo_anchor_fix": true,
+      "two_stage_reasoning": true,
+      "visual_hybrid_retrieval": true,
+      "confidence_weighted_vote": true
+    }
+  },
+  "env": {
+    "torch": "2.11.0+cu128",
+    "transformers": "4.51.3",
+    "bitsandbytes": "0.50.2",
+    "accelerate": "1.14.0",
+    "sentence-transformers": "5.7.0",
+    "datasets": "4.8.5"
+  },
+  "finished_at": "2026-10-03 22:30:00"
+}
