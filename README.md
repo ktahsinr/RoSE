@@ -233,3 +233,56 @@ has the full story), so the pilot lives inside that half. Stage 2 (routing
 the remaining questions on Kaggle) is a separate notebook built on
 `routing/router.py::route_file`; its routed-vs-always-7B comparison is
 limited to the cached half unless the 7B arm is re-run.
+
+## Query Decomposition (two arms, no routing)
+
+A second way to spend the small models: instead of *replacing* the 7B on
+easy questions (routing), help it on every question by splitting the
+question into two simpler sub-queries first. Both algorithms end in the
+**full, unchanged RoSE pipeline on Qwen2.5-VL-7B** (same m=5, k=3, λ=1.2,
+T=0.8; a single streaming 7B experience pool) and never import
+`chartqapro/routing/` — `tests/test_decompose.py` enforces that.
+
+**Algorithm 1 — decompose → parallel answer → evidence → RoSE.** The 7B
+splits the question into two sub-queries (JSON list; `[question,
+question]` fallback on parse failure). Gemma 3 4B answers sub-query 1 and
+Qwen3.5-4B answers sub-query 2 against the chart, each with 3 sampled
+paths and the agreement ratio as confidence. The sub-answers are
+prepended to the RoSE reasoning prompt as an evidence block; the final
+answer still comes from RoSE's own confidence-weighted vote.
+
+**Algorithm 2 — both small models decompose → vote → RoSE.** Gemma and
+Qwen3.5 each propose two sub-queries. An `all-mpnet-base-v2` vote either
+**merges** agreeing proposals (pairwise cosine ≥ 0.8 after best matching)
+or **picks** the proposal whose sub-queries sit closer to the original
+question; the rule that fired is logged per question. RoSE runs with the
+chosen sub-queries inserted as "answer these in order, then the main
+question" steps. No small model answers anything.
+
+Everything lives in `chartqapro/decompose/` (`prompts.py`,
+`decomposer.py`, `subanswer.py`, `vote.py`, `models.py`,
+`decomp_runner.py`). The runner mirrors the routed runner: all three
+models resident, a checkpoint after every question (errored rows retried
+on resume), a graceful `--budget-h` session budget, a gated-access check
+up front, and per run a per-question CSV, a per-stage summary CSV and a
+meta JSON with resolved revisions + library versions + the algorithm
+config. Correctness is always `scoring.py`'s verdict.
+
+```bash
+cd chartqapro
+
+# GPU (Kaggle T4 x2) — both algorithms over the first 250 factoids:
+#   chartqapro/notebooks/decomp_chartqapro.ipynb
+# or by hand, one algorithm at a time:
+python -m decompose.decomp_runner --algorithm 1 \
+       --dataset chartqapro --data /kaggle/temp/chartqapro_factoid.json \
+       --n 250 --out results/decompose/decomp_alg1.json
+
+# CPU tests (mocked models, no downloads)
+python tests/test_decompose.py
+
+# CPU: the cross-arm table — accuracy, mean params/q, mean latency/q,
+# and Alg 1's (sub-answer right, final wrong) / (sub wrong, final right)
+# counts; rescores every arm with scoring.py on their common questions
+python results/compare_arms.py
+```
