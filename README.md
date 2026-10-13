@@ -271,9 +271,14 @@ config. Correctness is always `scoring.py`'s verdict.
 ```bash
 cd chartqapro
 
-# GPU (Kaggle T4 x2) — both algorithms over the first 250 factoids:
-#   chartqapro/notebooks/decomp_chartqapro.ipynb
-# or by hand, one algorithm at a time:
+# GPU (Kaggle T4 x2) — one notebook per algorithm, first 250 factoids:
+#   chartqapro/notebooks/decomp_alg1_chartqapro.ipynb
+#   chartqapro/notebooks/decomp_alg2_chartqapro.ipynb
+# Each defaults to FAST_MODE=True (m=3 paths, no two-stage description
+# pass, no CLIP retrieval, smaller image grid) — roughly half the
+# per-question cost; the meta JSON records the exact config either way,
+# and FAST_MODE=False reproduces the routed run's spec-exact pipeline.
+# Or by hand, one algorithm at a time:
 python -m decompose.decomp_runner --algorithm 1 \
        --dataset chartqapro --data /kaggle/temp/chartqapro_factoid.json \
        --n 250 --out results/decompose/decomp_alg1.json

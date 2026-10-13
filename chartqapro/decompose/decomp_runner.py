@@ -554,6 +554,8 @@ def run_decomp(algorithm: int, dataset_path, out_path, n: int = None,
         "rose_config": {
             "m_paths": rose.M_PATHS, "k_demonstrations": rose.K_DEMONSTRATIONS,
             "lambda": rose.LAMBDA, "temperature": rose.TEMPERATURE,
+            "max_new_tokens": rose.MAX_NEW_TOKENS,
+            "max_pixels": rose.MAX_PIXELS,     # fast notebooks override this
             "extensions": rose.active_extensions(),
         },
         "env":              env_versions(),
