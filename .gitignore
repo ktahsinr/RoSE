@@ -34,3 +34,7 @@ npm-debug.log*
 
 # OS
 .DS_Store
+
+# …and the cross-arm comparison script, which lives next to the result
+# files it reads but is code, not output.
+!chartqapro/results/compare_arms.py
