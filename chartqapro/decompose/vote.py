@@ -46,15 +46,27 @@ def _unit(v) -> np.ndarray:
 
 
 def choose_decomposition(proposals: list, question: str, embed_fn,
-                         threshold: float = AGREE_THRESHOLD) -> dict:
+                         threshold: float = AGREE_THRESHOLD,
+                         fallbacks: "dict | None" = None) -> dict:
     """
-    Pick one decomposition out of two proposals.
+    Pick one decomposition out of (up to) two proposals.
 
     proposals : [(model_key, [sq1, sq2]), (model_key, [sq1, sq2])]
     embed_fn  : list[str] -> array-like of embeddings (all-mpnet-base-v2
                 in production; anything with the same shape in tests)
+    fallbacks : {model_key: bool} — True when that proposal is the parser's
+                [question, question] fallback. A fallback proposal is
+                EXCLUDED from the vote: its two sub-queries are the original
+                question verbatim, so its pairwise cosine to itself is 1.0
+                and its mean similarity to the question is 1.0 — left in,
+                it would always win both rules. None keeps the historical
+                behaviour (no exclusion).
 
     Rule, in order:
+      fallback — every proposal fell back: return the original question
+              (vote_rule "fallback"); the pipeline behaves like plain RoSE.
+      single — exactly one usable proposal (the other fell back, or only
+              one planner was asked): take it, vote_rule "single:<model>".
       merge — the proposals agree: after best matching of the 2x2 pairs
               (straight a1–b1/a2–b2 vs crossed a1–b2/a2–b1, whichever has
               the higher mean cosine), BOTH matched pairs clear
@@ -63,11 +75,31 @@ def choose_decomposition(proposals: list, question: str, embed_fn,
       pick  — otherwise take the whole proposal whose sub-queries have
               the higher MEAN cosine similarity to the original question.
 
-    Returns a dict with sub_queries, rule ("merge"/"pick"), vote_rule
-    (the loggable label, e.g. "merge" or "pick:gemma3-4b"), picked_model,
-    matching, pair_sims and mean_sim_to_question.
+    Returns a dict with sub_queries, rule ("fallback"/"single"/"merge"/
+    "pick"), vote_rule (the loggable label, e.g. "merge" or
+    "pick:gemma3-4b"), picked_model, matching, pair_sims and
+    mean_sim_to_question.
     """
-    (key_a, prop_a), (key_b, prop_b) = proposals
+    fallbacks = fallbacks or {}
+    usable = [(k, sq) for k, sq in proposals if not fallbacks.get(k)]
+
+    if not usable:
+        return {
+            "sub_queries": [question],
+            "rule": "fallback", "vote_rule": "fallback",
+            "picked_model": None, "matching": None, "pair_sims": [],
+            "mean_sim_to_question": {}, "threshold": threshold,
+        }
+    if len(usable) == 1:
+        key, prop = usable[0]
+        return {
+            "sub_queries": list(prop),
+            "rule": "single", "vote_rule": f"single:{key}",
+            "picked_model": key, "matching": None, "pair_sims": [],
+            "mean_sim_to_question": {}, "threshold": threshold,
+        }
+
+    (key_a, prop_a), (key_b, prop_b) = usable
     embs = np.asarray(embed_fn([question] + list(prop_a) + list(prop_b)))
     q, a0, a1, b0, b1 = (_unit(e) for e in embs)
 

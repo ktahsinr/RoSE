@@ -164,16 +164,27 @@ def _params_b(algorithm: int) -> float:
 # Per-question logic
 # ─────────────────────────────────────────────────────────────
 
-def _rose_with_block(sample, loaded, pool, block, clip_model, clip_processor):
-    model, processor = loaded[FINAL_MODEL]
+def _rose_with_block(sample, loaded, pool, block, clip_model, clip_processor,
+                     final_model: "str | None" = None):
+    model, processor = loaded[final_model or FINAL_MODEL]
     with inject_block(block):
         return rose.process_one(sample, model, processor, pool,
                                 clip_model=clip_model,
                                 clip_processor=clip_processor)
 
 
-def _run_alg1(sample, loaded, pool, clip_model, clip_processor):
-    """Decompose (7B) → parallel sub-answers (small models) → evidence → RoSE."""
+def _run_alg1(sample, loaded, pool, clip_model, clip_processor,
+              planners: "list | None" = None,
+              final_model: "str | None" = None):
+    """Decompose (7B) → parallel sub-answers (small models) → evidence → RoSE.
+
+    planners    : which small model answers sub-query i (in order); defaults
+                  to the module's SUB_ASSIGNMENT (SMALL_MODELS in order).
+    final_model : the model that runs the RoSE pipeline; defaults to
+                  FINAL_MODEL. Defaults reproduce the historical behaviour.
+    """
+    sub_assignment = (list(enumerate(planners)) if planners
+                      else list(SUB_ASSIGNMENT))
     question = sample["question"]
     image = rose.load_image(sample.get("image", ""))
     stage_lat = {}
@@ -186,7 +197,7 @@ def _run_alg1(sample, loaded, pool, clip_model, clip_processor):
     stage_lat["decompose"] = round(time.time() - t0, 2)
 
     subs = []
-    for idx, model_key in SUB_ASSIGNMENT:
+    for idx, model_key in sub_assignment:
         t0 = time.time()
         res = answer_subquery(
             sub_queries[idx],
@@ -199,7 +210,7 @@ def _run_alg1(sample, loaded, pool, clip_model, clip_processor):
 
     t0 = time.time()
     r = _rose_with_block(sample, loaded, pool, evidence + "\n\n",
-                         clip_model, clip_processor)
+                         clip_model, clip_processor, final_model)
     stage_lat["rose_final"] = round(time.time() - t0, 2)
 
     r.update({
@@ -216,14 +227,23 @@ def _run_alg1(sample, loaded, pool, clip_model, clip_processor):
     return r
 
 
-def _run_alg2(sample, loaded, pool, clip_model, clip_processor, embed_fn):
-    """Both small models decompose → embedding vote → RoSE with steps."""
+def _run_alg2(sample, loaded, pool, clip_model, clip_processor, embed_fn,
+              planners: "list | None" = None,
+              final_model: "str | None" = None):
+    """Both small models decompose → embedding vote → RoSE with steps.
+
+    planners    : the models that propose decompositions; defaults to
+                  SMALL_MODELS. A single planner skips the vote
+                  (vote_rule "single:<model>").
+    final_model : the model that runs the RoSE pipeline; defaults to
+                  FINAL_MODEL. Defaults reproduce the historical behaviour.
+    """
     question = sample["question"]
     image = rose.load_image(sample.get("image", ""))
     stage_lat = {}
 
     proposals, fallbacks = [], {}
-    for model_key in SMALL_MODELS:
+    for model_key in (list(planners) if planners else SMALL_MODELS):
         t0 = time.time()
         sq, fell_back, _raw = decompose(
             question,
@@ -234,13 +254,17 @@ def _run_alg2(sample, loaded, pool, clip_model, clip_processor, embed_fn):
         fallbacks[model_key] = fell_back
 
     t0 = time.time()
-    choice = vote.choose_decomposition(proposals, question, embed_fn)
+    choice = vote.choose_decomposition(proposals, question, embed_fn,
+                                       fallbacks=fallbacks)
     stage_lat["choose"] = round(time.time() - t0, 2)
 
+    # A full fallback means "answer the original question" — plain RoSE,
+    # no redundant steps block.
+    block = ("" if choice["vote_rule"] == "fallback"
+             else prompts.subquery_steps_block(choice["sub_queries"]))
     t0 = time.time()
-    r = _rose_with_block(sample, loaded, pool,
-                         prompts.subquery_steps_block(choice["sub_queries"]),
-                         clip_model, clip_processor)
+    r = _rose_with_block(sample, loaded, pool, block,
+                         clip_model, clip_processor, final_model)
     stage_lat["rose_final"] = round(time.time() - t0, 2)
 
     r.update({

@@ -114,6 +114,60 @@ def test_alg2_merge_vs_pick():
     print("✓ Alg 2 vote: merge on agreement, pick-closer otherwise")
 
 
+# ── 3b. fallback proposals are excluded from the vote ────────
+
+def test_vote_excludes_fallback_proposals():
+    q = "how much did revenue grow from 2019 to 2020?"
+    table = {
+        q:    [1.0, 0.0, 0.0],
+        "b1": [0.7, 0.3, 0.0], "b2": [0.6, 0.4, 0.0],
+    }
+
+    # THE DEFECT: a [question, question] fallback has cosine 1.0 to itself
+    # and to the question, so under the old rules it always won. With the
+    # fallback flag it is excluded and the real proposal wins.
+    old = choose_decomposition(
+        [("gemma3-4b", [q, q]), ("qwen3.5-4b", ["b1", "b2"])],
+        q, _embed_from(table))
+    assert old["sub_queries"] == [q, q]          # the defect, preserved
+    fixed = choose_decomposition(
+        [("gemma3-4b", [q, q]), ("qwen3.5-4b", ["b1", "b2"])],
+        q, _embed_from(table),
+        fallbacks={"gemma3-4b": True, "qwen3.5-4b": False})
+    assert fixed["rule"] == "single"
+    assert fixed["vote_rule"] == "single:qwen3.5-4b"
+    assert fixed["picked_model"] == "qwen3.5-4b"
+    assert fixed["sub_queries"] == ["b1", "b2"]
+
+    # Both fell back → the original question, plain RoSE downstream.
+    both = choose_decomposition(
+        [("gemma3-4b", [q, q]), ("qwen3.5-4b", [q, q])],
+        q, _embed_from(table),
+        fallbacks={"gemma3-4b": True, "qwen3.5-4b": True})
+    assert both["rule"] == "fallback" and both["vote_rule"] == "fallback"
+    assert both["sub_queries"] == [q]
+
+    # A single proposal (one planner asked) skips the vote the same way.
+    one = choose_decomposition(
+        [("gemma3-4b", ["b1", "b2"])], q, _embed_from(table),
+        fallbacks={"gemma3-4b": False})
+    assert one["vote_rule"] == "single:gemma3-4b"
+    assert one["sub_queries"] == ["b1", "b2"]
+
+    # No fallbacks → the merge/pick rules are untouched.
+    table2 = {
+        q:        [1.0, 1.0, 0.0],
+        "a-rev":  [1.0, 0.0, 0.0], "a-grow": [0.0, 1.0, 0.0],
+        "b-rev":  [0.98, 0.05, 0.0], "b-grow": [0.05, 0.98, 0.0],
+    }
+    out = choose_decomposition(
+        [("gemma3-4b", ["a-rev", "a-grow"]), ("qwen3.5-4b", ["b-rev", "b-grow"])],
+        q, _embed_from(table2),
+        fallbacks={"gemma3-4b": False, "qwen3.5-4b": False})
+    assert out["vote_rule"] == "merge"
+    print("✓ vote: fallback proposals excluded (single:<model> / fallback)")
+
+
 # ── 4. evidence block formatting ─────────────────────────────
 
 def test_evidence_block_formatting():
@@ -325,6 +379,76 @@ def test_runner_checkpoint_resume_and_budget():
         print("✓ budget stop + checkpoint resume: outputs written, nothing redone")
 
 
+def test_run_fns_accept_planners_and_final_model():
+    """Permitted change #1: _run_alg1/_run_alg2 take planners / final_model
+    as parameters, defaulting to the module constants."""
+    sample = {"id": "p-0", "question": "what is the tallest bar?",
+              "choices": None, "answer": "42", "question_type": "factoid",
+              "image": ""}
+    log = []
+    saved, _ = _install_mocks(log)
+    try:
+        # loaded holds ONLY gemma: with the module constants this would
+        # KeyError on the 7B, so passing both params is proven effective.
+        loaded = {"gemma3-4b": (_FakeModel(), object())}
+        pool = rose.ExperiencePool(_FakeEmbedder())
+        embed_fn = lambda texts: np.ones((len(list(texts)), 8))   # noqa: E731
+        r = decomp_runner._run_alg2(sample, loaded, pool, None, None, embed_fn,
+                                    planners=["gemma3-4b"],
+                                    final_model="gemma3-4b")
+        assert r["vote_rule"] == "single:gemma3-4b"
+        assert r["sub_queries"] == ["sub one", "sub two"]
+        assert log.count("decompose") == 1            # one planner, one call
+
+        # Alg 1: the sub-query assignment follows the planners parameter.
+        log.clear()
+        loaded = {"qwen3.5-4b": (_FakeModel(), object()),
+                  "qwen2.5-vl-7b": (_FakeModel(), object())}
+        pool = rose.ExperiencePool(_FakeEmbedder())
+        r = decomp_runner._run_alg1(sample, loaded, pool, None, None,
+                                    planners=["qwen3.5-4b"])
+        assert r["sub_models"] == ["qwen3.5-4b"]
+        assert len(r["sub_answers"]) == 1
+    finally:
+        _restore(saved)
+    print("✓ _run_alg1/_run_alg2 take planners + final_model (defaults unchanged)")
+
+
+def test_alg2_full_fallback_runs_plain_rose():
+    """When every proposal falls back, RoSE runs with no steps block."""
+    sample = {"id": "f-0", "question": "what is the tallest bar?",
+              "choices": None, "answer": "42", "question_type": "factoid",
+              "image": ""}
+    prompts_seen = []
+
+    def fake_call_vlm(model, processor, image, prompt,
+                      temperature=0.8, max_new_tokens=None):
+        if "JSON list" in prompt:
+            return "no json here, sorry"            # forces the fallback
+        prompts_seen.append(prompt)
+        return "The value is 42.\nFinal Answer: 42"
+
+    saved = (rose.call_vlm, rose.load_image, rose.ext)
+    rose.call_vlm = fake_call_vlm
+    rose.load_image = lambda field: object()
+    rose.ext = lambda name: False
+    try:
+        loaded = {k: (_FakeModel(), object())
+                  for k in ("qwen2.5-vl-7b", "gemma3-4b", "qwen3.5-4b")}
+        pool = rose.ExperiencePool(_FakeEmbedder())
+        embed_fn = lambda texts: np.ones((len(list(texts)), 8))   # noqa: E731
+        r = decomp_runner._run_alg2(sample, loaded, pool, None, None, embed_fn)
+    finally:
+        rose.call_vlm, rose.load_image, rose.ext = saved
+
+    assert r["vote_rule"] == "fallback"
+    assert r["sub_queries"] == [sample["question"]]
+    assert prompts_seen, "RoSE still ran"
+    assert all("Answer these sub-questions" not in p for p in prompts_seen), \
+        "a full fallback must not inject a steps block"
+    print("✓ Alg 2 full fallback: vote_rule 'fallback', plain RoSE prompt")
+
+
 def test_errored_rows_are_retried():
     with tempfile.TemporaryDirectory() as td:
         tmp = Path(td)
@@ -352,10 +476,13 @@ if __name__ == "__main__":
     test_parser_always_returns_two_strings()
     test_fallback_on_malformed_json()
     test_alg2_merge_vs_pick()
+    test_vote_excludes_fallback_proposals()
     test_evidence_block_formatting()
     test_alg1_never_imports_routing()
     test_runner_alg1_end_to_end()
     test_runner_alg2_end_to_end()
     test_runner_checkpoint_resume_and_budget()
+    test_run_fns_accept_planners_and_final_model()
+    test_alg2_full_fallback_runs_plain_rose()
     test_errored_rows_are_retried()
     print("\nall decompose tests passed")
