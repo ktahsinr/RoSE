@@ -5,24 +5,18 @@
  *  description. Narrow screens stack with the chart first (the chart pane
  *  comes first in the DOM; on wide screens the grid places it right). */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   apiUrl,
   getJSON,
-  postJSON,
   ApiError,
   type Health,
   type ModelInfo,
   type QuestionDetail,
   type QuestionItem,
-  type RunStarted,
 } from "@/lib/api";
-import {
-  EMPTY_TRACE,
-  reduceEvent,
-  traceFromStored,
-  type TraceState,
-} from "@/lib/trace";
+import { EMPTY_TRACE, traceFromStored } from "@/lib/trace";
+import { useLiveRun } from "@/lib/useLiveRun";
 import { useAnnounce } from "@/lib/announcer";
 import AnswerCard from "@/components/AnswerCard";
 import ChartViewer from "@/components/ChartViewer";
@@ -31,20 +25,10 @@ import QuestionPicker from "@/components/QuestionPicker";
 import RunStatus from "@/components/RunStatus";
 import Trace from "@/components/Trace";
 
-const SSE_EVENTS = [
-  "queued",
-  "started",
-  "stage.decompose",
-  "stage.vote",
-  "stage.describe",
-  "stage.path",
-  "stage.final",
-  "error",
-  "done",
-];
-
 export default function Explorer() {
   const announce = useAnnounce();
+  const { trace, setTrace, running, startedAt, setStartedAt, start, stop } =
+    useLiveRun();
 
   const [health, setHealth] = useState<Health | null>(null);
   const [models, setModels] = useState<ModelInfo[]>([]);
@@ -61,11 +45,6 @@ export default function Explorer() {
     finalModel: "qwen2.5-vl-7b",
     fastMode: true,
   });
-
-  const [trace, setTrace] = useState<TraceState>(EMPTY_TRACE);
-  const [running, setRunning] = useState(false);
-  const [startedAt, setStartedAt] = useState<number | null>(null);
-  const sourceRef = useRef<EventSource | null>(null);
 
   // ── bootstrap ─────────────────────────────────────────────
   useEffect(() => {
@@ -97,18 +76,10 @@ export default function Explorer() {
     return () => clearTimeout(t);
   }, [search, typeFilter]);
 
-  const stopStream = useCallback(() => {
-    sourceRef.current?.close();
-    sourceRef.current = null;
-    setRunning(false);
-  }, []);
-
-  useEffect(() => stopStream, [stopStream]);
-
   // ── selection ─────────────────────────────────────────────
   const selectQuestion = useCallback(
     (q: QuestionItem) => {
-      stopStream();
+      stop();
       setTrace(EMPTY_TRACE);
       getJSON<QuestionDetail>(`/questions/${q.id}`)
         .then((d) => {
@@ -117,71 +88,21 @@ export default function Explorer() {
         })
         .catch((e: ApiError) => setLoadError(e.message));
     },
-    [announce, stopStream],
+    [announce, stop, setTrace],
   );
 
   // ── replay ────────────────────────────────────────────────
   const showStored = useCallback(() => {
     const stored = detail?.replay?.alg2;
     if (!stored) return;
-    stopStream();
-    const t = traceFromStored(stored);
-    setTrace(t);
+    stop();
+    setTrace(traceFromStored(stored));
     setStartedAt(null);
     announce(
       `Showing the stored result. Final answer: ${stored.final_answer}.` +
         (stored.is_correct ? " It matches the expected answer." : ""),
     );
-  }, [announce, detail, stopStream]);
-
-  // ── live run ──────────────────────────────────────────────
-  const runLive = useCallback(async () => {
-    if (!detail || running || choice.planners.length === 0) return;
-    stopStream();
-    setTrace({ ...EMPTY_TRACE, source: "live", statusText: "Starting run…" });
-    setStartedAt(Date.now());
-    setRunning(true);
-    announce("Starting a live run.");
-    try {
-      const started = await postJSON<RunStarted>("/run", {
-        question_id: detail.id,
-        planners: choice.planners,
-        final_model: choice.finalModel,
-        fast_mode: choice.fastMode,
-      });
-      const es = new EventSource(apiUrl(`/run/${started.run_id}/events`));
-      sourceRef.current = es;
-      for (const name of SSE_EVENTS) {
-        es.addEventListener(name, (ev) => {
-          const data = JSON.parse((ev as MessageEvent).data);
-          if (typeof data.announce === "string") announce(data.announce);
-          setTrace((prev) => reduceEvent(prev, { event: name, data }));
-          if (name === "done" || name === "error") {
-            es.close();
-            sourceRef.current = null;
-            setRunning(false);
-          }
-        });
-      }
-      es.onerror = () => {
-        // EventSource retries by itself; only report when it gave up closed.
-        if (es.readyState === EventSource.CLOSED) {
-          setTrace((prev) => ({
-            ...prev,
-            error: "Lost the connection to the backend during the run.",
-            stage: 4,
-          }));
-          announce("Lost the connection to the backend during the run.");
-          setRunning(false);
-        }
-      };
-    } catch (e) {
-      const msg = e instanceof ApiError ? e.message : String(e);
-      setTrace((prev) => ({ ...prev, error: msg, stage: 4 }));
-      announce(`The run could not start: ${msg}`);
-      setRunning(false);
-    }
-  }, [announce, choice, detail, running, stopStream]);
+  }, [announce, detail, stop, setTrace, setStartedAt]);
 
   // ── derived ───────────────────────────────────────────────
   const demoMode = health?.mode === "demo";
@@ -221,7 +142,7 @@ export default function Explorer() {
       <div className="grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,4fr)]">
         {/* Chart pane — first in the DOM so narrow screens show it first;
             on wide screens the grid places it in the right column. */}
-        <div className="min-w-0 lg:order-2 lg:sticky lg:top-4 lg:self-start">
+        <div className="min-w-0 lg:sticky lg:top-4 lg:order-2 lg:self-start">
           <ChartViewer
             src={detail?.image_url ? apiUrl(detail.image_url) : null}
             description={description}
@@ -255,7 +176,15 @@ export default function Explorer() {
           <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"
-              onClick={runLive}
+              onClick={() =>
+                detail &&
+                start({
+                  question_id: detail.id,
+                  planners: choice.planners,
+                  final_model: choice.finalModel,
+                  fast_mode: choice.fastMode,
+                })
+              }
               disabled={
                 !detail || demoMode || running || choice.planners.length === 0
               }
