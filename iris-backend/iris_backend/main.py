@@ -47,7 +47,7 @@ def create_app(settings: "Settings | None" = None) -> FastAPI:
         if not state.settings.demo_mode:
             try:
                 from .live import LiveEngine
-                state.engine = LiveEngine(state.settings)
+                state.engine = LiveEngine(state.settings, state.by_id)
                 await asyncio.to_thread(state.engine.load)
             except Exception as exc:  # noqa: BLE001 — degrade visibly, not silently
                 import traceback
