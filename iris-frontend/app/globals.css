@@ -1,0 +1,211 @@
+@import "tailwindcss";
+
+/* Locally bundled fonts — no CDN (zero-cost constraint). */
+@import "@fontsource/atkinson-hyperlegible/400.css";
+@import "@fontsource/atkinson-hyperlegible/700.css";
+@import "@fontsource/atkinson-hyperlegible/400-italic.css";
+@import "@fontsource/opendyslexic/400.css";
+@import "@fontsource/opendyslexic/700.css";
+
+/* ── IRIS theme tokens ─────────────────────────────────────────
+   Palette derives from the iris/eye logo: deep blue-violet with
+   high-contrast amber accents. Text contrast targets WCAG AAA (≥7:1).
+   Themes: light (default), dark, hc (high contrast); with no explicit
+   choice the system preference applies. */
+:root {
+  --bg: #fbfafe;
+  --surface: #f2eff9;
+  --surface2: #e7e2f3;
+  --fg: #201a33;
+  --muted: #554c70;
+  --line: #c3bbdb;
+  --accent: #443796;
+  --accent-strong: #352a78;
+  --accent-soft: #e3def6;
+  --amber: #8a4c00;
+  --amber-soft: #f7e6c9;
+  --ok: #1b6b3a;
+  --ok-soft: #d9efe1;
+  --err: #a01d2e;
+  --err-soft: #f9dfe2;
+  --focus: #352a78;
+  --text-zoom: 1;
+  --font-sans: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI",
+    sans-serif;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="hc"]) {
+    --bg: #141022;
+    --surface: #1d1833;
+    --surface2: #272042;
+    --fg: #ece8f8;
+    --muted: #aba3ca;
+    --line: #453d6b;
+    --accent: #b2a6f7;
+    --accent-strong: #c9c0fa;
+    --accent-soft: #2b2452;
+    --amber: #ffc266;
+    --amber-soft: #3a2c14;
+    --ok: #6fcf97;
+    --ok-soft: #173325;
+    --err: #ff93a0;
+    --err-soft: #3d1a20;
+    --focus: #ffc266;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #141022;
+  --surface: #1d1833;
+  --surface2: #272042;
+  --fg: #ece8f8;
+  --muted: #aba3ca;
+  --line: #453d6b;
+  --accent: #b2a6f7;
+  --accent-strong: #c9c0fa;
+  --accent-soft: #2b2452;
+  --amber: #ffc266;
+  --amber-soft: #3a2c14;
+  --ok: #6fcf97;
+  --ok-soft: #173325;
+  --err: #ff93a0;
+  --err-soft: #3d1a20;
+  --focus: #ffc266;
+  color-scheme: dark;
+}
+
+:root[data-theme="hc"] {
+  --bg: #000000;
+  --surface: #000000;
+  --surface2: #14140a;
+  --fg: #ffffff;
+  --muted: #f2f2d8;
+  --line: #ffffff;
+  --accent: #ffd24d;
+  --accent-strong: #ffe38a;
+  --accent-soft: #1f1a00;
+  --amber: #ffd24d;
+  --amber-soft: #1f1a00;
+  --ok: #7cff9f;
+  --ok-soft: #002a10;
+  --err: #ff9c9c;
+  --err-soft: #2a0000;
+  --focus: #ffd24d;
+  color-scheme: dark;
+}
+
+:root[data-font="dyslexic"] {
+  --font-sans: "OpenDyslexic", "Atkinson Hyperlegible", system-ui, sans-serif;
+}
+
+/* Expose tokens to Tailwind v4 utilities (bg-bg, text-fg, border-line, …). */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface2: var(--surface2);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-amber: var(--amber);
+  --color-amber-soft: var(--amber-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-err: var(--err);
+  --color-err-soft: var(--err-soft);
+  --font-sans: var(--font-sans);
+}
+
+/* Base: 18px scaled by the persistent text-size control (up to 200%). */
+html {
+  font-size: calc(18px * var(--text-zoom, 1));
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+}
+
+/* Visible focus everywhere, never removed. */
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+:root[data-theme="hc"] :focus-visible {
+  outline-width: 4px;
+}
+
+/* Skip link: first element, hidden until focused. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  background: var(--accent);
+  color: var(--bg);
+  padding: 0.5rem 1rem;
+  border-radius: 0 0 0.5rem 0;
+  font-weight: 700;
+}
+.skip-link:focus {
+  left: 0;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* The pupil of the logo dilates while a run is in progress. */
+@keyframes iris-pupil {
+  0%,
+  100% {
+    r: 5.2;
+  }
+  50% {
+    r: 7.2;
+  }
+}
+.iris-pupil-busy {
+  animation: iris-pupil 2.4s ease-in-out infinite;
+}
+
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+.pulse-soft {
+  animation: pulse-soft 1.8s ease-in-out infinite;
+}
+
+/* All animation is optional. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
