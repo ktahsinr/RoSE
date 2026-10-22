@@ -55,6 +55,7 @@ export default function RunStatus({
         <div className="mt-2">
           <div
             role="progressbar"
+            aria-label="Run progress"
             aria-valuemin={0}
             aria-valuemax={4}
             aria-valuenow={stage}

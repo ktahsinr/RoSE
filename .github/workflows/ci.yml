@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "feature/**"]
+  pull_request:
+
+jobs:
+  zero-cost:
+    name: Zero-cost hostname check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python scripts/check_hostnames.py
+
+  backend:
+    name: Backend tests (demo mode + mocked live)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          pip install -r iris-backend/requirements.txt
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install numpy sentence-transformers
+      - name: iris-backend pytest
+        run: cd iris-backend && python -m pytest tests/ -q
+      - name: chartqapro decompose tests (mocked, CPU)
+        run: cd chartqapro && python tests/test_decompose.py
+
+  frontend:
+    name: Frontend build + keyboard & axe-core e2e
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Backend dependencies (demo mode)
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install -r iris-backend/requirements.txt
+      - name: Frontend dependencies
+        run: cd iris-frontend && npm ci && npx playwright install --with-deps chromium
+      - name: Playwright (keyboard-only flows + axe-core on every page/theme)
+        run: cd iris-frontend && npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: iris-frontend/test-results/

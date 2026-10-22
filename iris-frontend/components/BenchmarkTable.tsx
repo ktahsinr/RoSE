@@ -51,7 +51,6 @@ export default function BenchmarkTable({
                 onClick={() => {
                   setSortKey(-1);
                 }}
-                aria-sort={sortKey === -1 ? "none" : undefined}
                 className="font-bold underline-offset-4 hover:underline"
               >
                 Model (grouped)

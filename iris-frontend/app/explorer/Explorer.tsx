@@ -152,8 +152,11 @@ export default function Explorer() {
           />
         </div>
 
-        {/* Work pane */}
+        {/* Work pane. The answer card comes first so the answer and the
+            chart are verifiable on one 1366px screen without scrolling. */}
         <div className="flex min-w-0 flex-col gap-5 lg:order-1">
+          {trace.final && <AnswerCard final={trace.final} />}
+
           <QuestionPicker
             items={items}
             total={total}
@@ -205,8 +208,6 @@ export default function Explorer() {
               <span className="text-muted">No stored result for this question.</span>
             )}
           </div>
-
-          {trace.final && <AnswerCard final={trace.final} />}
 
           <Trace trace={trace} />
         </div>

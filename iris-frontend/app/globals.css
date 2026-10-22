@@ -17,17 +17,17 @@
   --surface: #f2eff9;
   --surface2: #e7e2f3;
   --fg: #201a33;
-  --muted: #554c70;
+  --muted: #4a4163;
   --line: #c3bbdb;
   --accent: #443796;
   --accent-strong: #352a78;
   --accent-soft: #e3def6;
-  --amber: #8a4c00;
-  --amber-soft: #f7e6c9;
-  --ok: #1b6b3a;
-  --ok-soft: #d9efe1;
-  --err: #a01d2e;
-  --err-soft: #f9dfe2;
+  --amber: #6e3a00;
+  --amber-soft: #f9ecd6;
+  --ok: #115229;
+  --ok-soft: #e2f3e9;
+  --err: #8a1222;
+  --err-soft: #fbe8eb;
   --focus: #352a78;
   --text-zoom: 1;
   --font-sans: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI",
@@ -43,9 +43,9 @@
     --fg: #ece8f8;
     --muted: #aba3ca;
     --line: #453d6b;
-    --accent: #b2a6f7;
+    --accent: #beb4f8;
     --accent-strong: #c9c0fa;
-    --accent-soft: #2b2452;
+    --accent-soft: #262045;
     --amber: #ffc266;
     --amber-soft: #3a2c14;
     --ok: #6fcf97;
@@ -64,9 +64,9 @@
   --fg: #ece8f8;
   --muted: #aba3ca;
   --line: #453d6b;
-  --accent: #b2a6f7;
+  --accent: #beb4f8;
   --accent-strong: #c9c0fa;
-  --accent-soft: #2b2452;
+  --accent-soft: #262045;
   --amber: #ffc266;
   --amber-soft: #3a2c14;
   --ok: #6fcf97;

@@ -138,7 +138,7 @@ export default function ChartViewer({
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
-        className="relative min-h-64 overflow-hidden rounded-lg border-2 border-line bg-white"
+        className="relative min-h-64 overflow-hidden rounded-lg border-2 border-line bg-surface"
         style={{ touchAction: zoom > 1 ? "none" : "auto" }}
       >
         {src ? (

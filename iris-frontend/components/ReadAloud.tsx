@@ -58,7 +58,7 @@ export default function ReadAloud({
     <button
       type="button"
       onClick={start}
-      aria-label={`Read ${label} aloud`}
+      aria-label={`Read aloud: ${label}`}
       className="inline-flex items-center gap-1 rounded-full border border-accent px-3 py-1 text-sm font-bold text-accent hover:bg-accent-soft"
     >
       <span aria-hidden="true">🔊</span> Read aloud

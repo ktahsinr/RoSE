@@ -72,10 +72,9 @@ export default function Header() {
               type="button"
               onClick={() => setStep(-1)}
               disabled={settings.textStep === 0}
-              aria-label="Decrease text size"
               className="rounded border-2 border-line px-2 py-0.5 font-bold hover:bg-surface2 disabled:opacity-40"
             >
-              A−
+              A−<span className="sr-only"> decrease text size</span>
             </button>
             <button
               type="button"
@@ -91,10 +90,9 @@ export default function Header() {
               type="button"
               onClick={() => setStep(1)}
               disabled={settings.textStep === TEXT_STEPS.length - 1}
-              aria-label="Increase text size"
               className="rounded border-2 border-line px-2 py-0.5 font-bold hover:bg-surface2 disabled:opacity-40"
             >
-              A+
+              A+<span className="sr-only"> increase text size</span>
             </button>
           </fieldset>
 
