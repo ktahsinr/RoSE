@@ -1,0 +1,338 @@
+[
+  {
+    "id": "factoid-00000",
+    "question": "In which year did revenue peak?",
+    "question_type": "factoid",
+    "choices": null,
+    "options_shown": null,
+    "option_perms": null,
+    "ground_truth": "2019",
+    "prediction": "2019",
+    "prediction_norm": "2019",
+    "is_correct": true,
+    "method": "zero_shot_cot",
+    "uncertainty": 0.15,
+    "complexity": 2.0,
+    "agreement": 1.0,
+    "vote_mode": "exact",
+    "n_groups": 1,
+    "paths_voting": 3,
+    "n_demos": 0,
+    "pool_size": 0,
+    "chart_description": "A vertical bar chart titled \u201cAnnual revenue (sample data)\u201d with 4 bars (2019, 2020, 2021, 2022), y-axis in $M. The tallest bar is 2019 (48) and the shortest is 2020 (31).",
+    "best_rationale": "Step 1: What are the values shown for 2019 and 2022? The chart shows the plotted values.\nStep 2: Using those values, in which year did revenue peak? Comparing them gives the result.\nFinal Answer: 2019",
+    "raw_outputs": [
+      "Step 1: What are the values shown for 2019 and 2022? The chart shows the plotted values.\nStep 2: Using those values, in which year did revenue peak? Comparing them gives the result.\nFinal Answer: 2019",
+      "Step 1: What are the values shown for 2019 and 2022? The chart shows the plotted values.\nStep 2: Using those values, in which year did revenue peak? Comparing them gives the result.\nFinal Answer: 2019",
+      "Step 1: What are the values shown for 2019 and 2022? The chart shows the plotted values.\nStep 2: Using those values, in which year did revenue peak? Reading off and comparing them gives the result.\nFinal Answer: 2019"
+    ],
+    "extracted": [
+      "2019",
+      "2019",
+      "2019"
+    ],
+    "normalized": [
+      "2019",
+      "2019",
+      "2019"
+    ],
+    "algorithm": 2,
+    "sub_queries": [
+      "What are the values shown for 2019 and 2022?",
+      "Using those values, in which year did revenue peak?"
+    ],
+    "sub_answers": [],
+    "sub_confidences": [],
+    "sub_models": [],
+    "decomp_fallback": {
+      "gemma3-4b": false,
+      "qwen3.5-4b": false
+    },
+    "vote_rule": "merge",
+    "proposals": {
+      "gemma3-4b": [
+        "What are the values shown for 2019 and 2022?",
+        "Using those values, in which year did revenue peak?"
+      ],
+      "qwen3.5-4b": [
+        "Which are the values shown for 2019 and 2022?",
+        "Using those values, in which year did revenue peak?"
+      ]
+    },
+    "vote": {
+      "rule": "merge",
+      "picked_model": null,
+      "matching": "straight",
+      "pair_sims": [
+        0.91,
+        0.87
+      ],
+      "mean_sim_to_question": {
+        "gemma3-4b": 0.74,
+        "qwen3.5-4b": 0.69
+      },
+      "threshold": 0.8
+    },
+    "stage_latency_s": {
+      "decompose_gemma3-4b": 9.4,
+      "decompose_qwen3.5-4b": 12.1,
+      "choose": 0.2,
+      "rose_final": 96.5
+    },
+    "params_b_used": 16.6,
+    "latency_s": 118.2,
+    "model_key": "qwen2.5-vl-7b"
+  },
+  {
+    "id": "factoid-00001",
+    "question": "What was the unemployment rate in March?",
+    "question_type": "factoid",
+    "choices": null,
+    "options_shown": null,
+    "option_perms": null,
+    "ground_truth": "8",
+    "prediction": "8",
+    "prediction_norm": "8",
+    "is_correct": true,
+    "method": "zero_shot_cot",
+    "uncertainty": 0.2,
+    "complexity": 2.0,
+    "agreement": 0.6667,
+    "vote_mode": "exact",
+    "n_groups": 1,
+    "paths_voting": 3,
+    "n_demos": 0,
+    "pool_size": 1,
+    "chart_description": "A vertical bar chart titled \u201cUnemployment rate by month (sample data)\u201d with 4 bars (Jan, Feb, Mar, Apr), y-axis in %. The tallest bar is Mar (8) and the shortest is Feb (5).",
+    "best_rationale": "Step 1: What are the values shown for Jan and Apr? The chart shows the plotted values.\nStep 2: Using those values, what was the unemployment rate in March? Comparing them gives the result.\nFinal Answer: 8",
+    "raw_outputs": [
+      "Step 1: What are the values shown for Jan and Apr? The chart shows the plotted values.\nStep 2: Using those values, what was the unemployment rate in March? Comparing them gives the result.\nFinal Answer: 8",
+      "Step 1: What are the values shown for Jan and Apr? The chart shows the plotted values.\nStep 2: Using those values, what was the unemployment rate in March? Comparing them gives the result.\nFinal Answer: 8",
+      "Step 1: What are the values shown for Jan and Apr? The chart shows the plotted values.\nStep 2: Using those values, what was the unemployment rate in March? Reading off and comparing them gives the result.\nFinal Answer: 8"
+    ],
+    "extracted": [
+      "8",
+      "8",
+      "8"
+    ],
+    "normalized": [
+      "8",
+      "8",
+      "8"
+    ],
+    "algorithm": 2,
+    "sub_queries": [
+      "What are the values shown for Jan and Apr?",
+      "Using those values, what was the unemployment rate in March?"
+    ],
+    "sub_answers": [],
+    "sub_confidences": [],
+    "sub_models": [],
+    "decomp_fallback": {
+      "gemma3-4b": false,
+      "qwen3.5-4b": false
+    },
+    "vote_rule": "pick:gemma3-4b",
+    "proposals": {
+      "gemma3-4b": [
+        "What are the values shown for Jan and Apr?",
+        "Using those values, what was the unemployment rate in March?"
+      ],
+      "qwen3.5-4b": [
+        "Which are the values shown for Jan and Apr?",
+        "Using those values, what was the unemployment rate in March?"
+      ]
+    },
+    "vote": {
+      "rule": "pick",
+      "picked_model": "gemma3-4b",
+      "matching": "straight",
+      "pair_sims": [
+        0.62,
+        0.55
+      ],
+      "mean_sim_to_question": {
+        "gemma3-4b": 0.74,
+        "qwen3.5-4b": 0.69
+      },
+      "threshold": 0.8
+    },
+    "stage_latency_s": {
+      "decompose_gemma3-4b": 9.4,
+      "decompose_qwen3.5-4b": 12.1,
+      "choose": 0.2,
+      "rose_final": 96.5
+    },
+    "params_b_used": 16.6,
+    "latency_s": 118.2,
+    "model_key": "qwen2.5-vl-7b"
+  },
+  {
+    "id": "factoid-00002",
+    "question": "How many more units did the North region sell than the South?",
+    "question_type": "factoid",
+    "choices": null,
+    "options_shown": null,
+    "option_perms": null,
+    "ground_truth": "35",
+    "prediction": "35",
+    "prediction_norm": "35",
+    "is_correct": true,
+    "method": "zero_shot_cot",
+    "uncertainty": 0.25,
+    "complexity": 2.0,
+    "agreement": 1.0,
+    "vote_mode": "exact",
+    "n_groups": 1,
+    "paths_voting": 3,
+    "n_demos": 0,
+    "pool_size": 2,
+    "chart_description": "A vertical bar chart titled \u201cUnits sold by region (sample data)\u201d with 4 bars (North, South, East, West), y-axis in units. The tallest bar is North (120) and the shortest is West (60).",
+    "best_rationale": "Step 1: What are the values shown for North and West? The chart shows the plotted values.\nStep 2: Using those values, how many more units did the North region sell than the South? Comparing them gives the result.\nFinal Answer: 35",
+    "raw_outputs": [
+      "Step 1: What are the values shown for North and West? The chart shows the plotted values.\nStep 2: Using those values, how many more units did the North region sell than the South? Comparing them gives the result.\nFinal Answer: 35",
+      "Step 1: What are the values shown for North and West? The chart shows the plotted values.\nStep 2: Using those values, how many more units did the North region sell than the South? Comparing them gives the result.\nFinal Answer: 35",
+      "Step 1: What are the values shown for North and West? The chart shows the plotted values.\nStep 2: Using those values, how many more units did the North region sell than the South? Reading off and comparing them gives the result.\nFinal Answer: 35"
+    ],
+    "extracted": [
+      "35",
+      "35",
+      "35"
+    ],
+    "normalized": [
+      "35",
+      "35",
+      "35"
+    ],
+    "algorithm": 2,
+    "sub_queries": [
+      "What are the values shown for North and West?",
+      "Using those values, how many more units did the North region sell than the South?"
+    ],
+    "sub_answers": [],
+    "sub_confidences": [],
+    "sub_models": [],
+    "decomp_fallback": {
+      "gemma3-4b": false,
+      "qwen3.5-4b": false
+    },
+    "vote_rule": "merge",
+    "proposals": {
+      "gemma3-4b": [
+        "What are the values shown for North and West?",
+        "Using those values, how many more units did the North region sell than the South?"
+      ],
+      "qwen3.5-4b": [
+        "Which are the values shown for North and West?",
+        "Using those values, how many more units did the North region sell than the South?"
+      ]
+    },
+    "vote": {
+      "rule": "merge",
+      "picked_model": null,
+      "matching": "straight",
+      "pair_sims": [
+        0.91,
+        0.87
+      ],
+      "mean_sim_to_question": {
+        "gemma3-4b": 0.74,
+        "qwen3.5-4b": 0.69
+      },
+      "threshold": 0.8
+    },
+    "stage_latency_s": {
+      "decompose_gemma3-4b": 9.4,
+      "decompose_qwen3.5-4b": 12.1,
+      "choose": 0.2,
+      "rose_final": 96.5
+    },
+    "params_b_used": 16.6,
+    "latency_s": 118.2,
+    "model_key": "qwen2.5-vl-7b"
+  },
+  {
+    "id": "factoid-00003",
+    "question": "Which product had the lowest sales?",
+    "question_type": "factoid",
+    "choices": null,
+    "options_shown": null,
+    "option_perms": null,
+    "ground_truth": "Beta",
+    "prediction": "Beta",
+    "prediction_norm": "beta",
+    "is_correct": true,
+    "method": "rose_few_shot",
+    "uncertainty": 0.3,
+    "complexity": 2.0,
+    "agreement": 0.6667,
+    "vote_mode": "exact",
+    "n_groups": 1,
+    "paths_voting": 3,
+    "n_demos": 3,
+    "pool_size": 3,
+    "chart_description": "A vertical bar chart titled \u201cSales by product (sample data)\u201d with 4 bars (Alpha, Beta, Gamma, Delta), y-axis in k. The tallest bar is Gamma (61) and the shortest is Beta (23).",
+    "best_rationale": "Step 1: What are the values shown for Alpha and Delta? The chart shows the plotted values.\nStep 2: Using those values, which product had the lowest sales? Comparing them gives the result.\nFinal Answer: Beta",
+    "raw_outputs": [
+      "Step 1: What are the values shown for Alpha and Delta? The chart shows the plotted values.\nStep 2: Using those values, which product had the lowest sales? Comparing them gives the result.\nFinal Answer: Beta",
+      "Step 1: What are the values shown for Alpha and Delta? The chart shows the plotted values.\nStep 2: Using those values, which product had the lowest sales? Comparing them gives the result.\nFinal Answer: Beta",
+      "Step 1: What are the values shown for Alpha and Delta? The chart shows the plotted values.\nStep 2: Using those values, which product had the lowest sales? Reading off and comparing them gives the result.\nFinal Answer: Beta"
+    ],
+    "extracted": [
+      "Beta",
+      "Beta",
+      "Beta"
+    ],
+    "normalized": [
+      "beta",
+      "beta",
+      "beta"
+    ],
+    "algorithm": 2,
+    "sub_queries": [
+      "What are the values shown for Alpha and Delta?",
+      "Using those values, which product had the lowest sales?"
+    ],
+    "sub_answers": [],
+    "sub_confidences": [],
+    "sub_models": [],
+    "decomp_fallback": {
+      "gemma3-4b": false,
+      "qwen3.5-4b": false
+    },
+    "vote_rule": "pick:gemma3-4b",
+    "proposals": {
+      "gemma3-4b": [
+        "What are the values shown for Alpha and Delta?",
+        "Using those values, which product had the lowest sales?"
+      ],
+      "qwen3.5-4b": [
+        "Which are the values shown for Alpha and Delta?",
+        "Using those values, which product had the lowest sales?"
+      ]
+    },
+    "vote": {
+      "rule": "pick",
+      "picked_model": "gemma3-4b",
+      "matching": "straight",
+      "pair_sims": [
+        0.62,
+        0.55
+      ],
+      "mean_sim_to_question": {
+        "gemma3-4b": 0.74,
+        "qwen3.5-4b": 0.69
+      },
+      "threshold": 0.8
+    },
+    "stage_latency_s": {
+      "decompose_gemma3-4b": 9.4,
+      "decompose_qwen3.5-4b": 12.1,
+      "choose": 0.2,
+      "rose_final": 96.5
+    },
+    "params_b_used": 16.6,
+    "latency_s": 118.2,
+    "model_key": "qwen2.5-vl-7b"
+  }
+]

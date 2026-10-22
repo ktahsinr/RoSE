@@ -25,6 +25,7 @@ chartqapro/results/*
 # Environment / secrets
 .env
 .env.*
+!.env.example
 *.pem
 *.key
 

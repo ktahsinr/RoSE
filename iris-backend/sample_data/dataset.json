@@ -1,0 +1,52 @@
+[
+  {
+    "id": "factoid-00000",
+    "question": "In which year did revenue peak?",
+    "choices": null,
+    "answer": "2019",
+    "question_type": "factoid",
+    "image": "/kaggle/temp/images/00000.png"
+  },
+  {
+    "id": "factoid-00001",
+    "question": [
+      "What was the unemployment rate in March?"
+    ],
+    "choices": null,
+    "answer": "8",
+    "question_type": "factoid",
+    "image": "/kaggle/temp/images/00001.png"
+  },
+  {
+    "id": "factoid-00002",
+    "question": "How many more units did the North region sell than the South?",
+    "choices": null,
+    "answer": "35",
+    "question_type": "factoid",
+    "image": "/kaggle/temp/images/00002.png"
+  },
+  {
+    "id": "factoid-00003",
+    "question": "Which product had the lowest sales?",
+    "choices": null,
+    "answer": "Beta",
+    "question_type": "factoid",
+    "image": "/kaggle/temp/images/00003.png"
+  },
+  {
+    "id": "factoid-00004",
+    "question": "What is the difference between the highest and lowest bars?",
+    "choices": null,
+    "answer": "120",
+    "question_type": "factoid",
+    "image": "/kaggle/temp/images/00004.png"
+  },
+  {
+    "id": "factoid-00005",
+    "question": "What share of the total do cars represent?",
+    "choices": null,
+    "answer": "50",
+    "question_type": "factoid",
+    "image": "/kaggle/temp/images/00005.png"
+  }
+]
