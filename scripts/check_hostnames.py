@@ -22,6 +22,9 @@ EXTENSIONS = {".py", ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs",
               ".css", ".html", ".json", ".yml", ".yaml"}
 SKIP_PARTS = {"node_modules", ".next", "__pycache__", "test-results",
               "playwright-report", "sample_data"}
+# Generated files whose URLs are package-manager metadata or tooling
+# comments, not anything the app ships or calls at runtime.
+SKIP_FILES = {"package-lock.json", "next-env.d.ts"}
 
 ALLOWED = re.compile(
     r"^(localhost|127\.0\.0\.1|0\.0\.0\.0|"
@@ -40,7 +43,8 @@ def main() -> int:
             continue
         for path in base.rglob("*"):
             if (not path.is_file() or path.suffix not in EXTENSIONS
-                    or SKIP_PARTS & set(path.parts)):
+                    or SKIP_PARTS & set(path.parts)
+                    or path.name in SKIP_FILES):
                 continue
             text = path.read_text(errors="ignore")
             for m in URL_RE.finditer(text):
