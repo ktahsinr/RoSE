@@ -19,7 +19,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="h-full">
+    // The boot script sets theme/font/zoom attributes on <html> before
+    // hydration (so there is no flash), so React must not warn about them.
+    <html lang="en" className="h-full" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: BOOT_SCRIPT }} />
       </head>

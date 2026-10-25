@@ -30,6 +30,15 @@ class AppState:
         if settings.dataset_json and settings.dataset_json.exists():
             self.records = load_dataset(settings.dataset_json)
             self.by_id = {r["id"]: r for r in self.records}
+        elif settings.dataset_json:
+            print(f"⚠  IRIS_DATASET_JSON not found: {settings.dataset_json} "
+                  "— serving 0 questions. Check the path (it must be "
+                  "absolute or relative to the server's working directory).")
+        else:
+            print("⚠  IRIS_DATASET_JSON is not set — serving 0 questions.")
+        if not self.replay.runs:
+            print(f"ℹ  no stored run files in {settings.results_dir} — "
+                  "replay disabled.")
 
     # ── queue ────────────────────────────────────────────────
 

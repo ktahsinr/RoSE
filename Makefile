@@ -4,9 +4,11 @@
 # `make dev` runs both.
 
 PYTHON ?= .venv/bin/python
-export IRIS_DATASET_JSON ?= iris-backend/sample_data/dataset.json
-export IRIS_IMAGE_DIR    ?= iris-backend/sample_data/images
-export IRIS_RESULTS_DIR  ?= iris-backend/sample_data/results
+# Absolute paths: the backend target runs with cwd iris-backend/, so
+# root-relative values would silently resolve to nowhere (count: 0).
+export IRIS_DATASET_JSON ?= $(CURDIR)/iris-backend/sample_data/dataset.json
+export IRIS_IMAGE_DIR    ?= $(CURDIR)/iris-backend/sample_data/images
+export IRIS_RESULTS_DIR  ?= $(CURDIR)/iris-backend/sample_data/results
 
 .PHONY: backend frontend dev test test-backend test-frontend sample-data check-hosts
 
