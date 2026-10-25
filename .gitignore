@@ -39,3 +39,6 @@ npm-debug.log*
 # …and the cross-arm comparison script, which lives next to the result
 # files it reads but is code, not output.
 !chartqapro/results/compare_arms.py
+
+# Locally built datasets (scripts/build_chartqapro_dataset.py)
+data/

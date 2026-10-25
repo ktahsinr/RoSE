@@ -80,11 +80,22 @@ make frontend    # Next.js on :3000
 ```
 
 The defaults point at `iris-backend/sample_data/` (synthetic, clearly
-labelled). For the real demo, drop the Kaggle run outputs
-(`decomp_alg2.json` + `.csv`, optionally `decomp_alg1.*`) into a folder and
-point `IRIS_RESULTS_DIR` at it — the JSON is preferred, as only it carries
-the full RoSE paths — plus `IRIS_DATASET_JSON` / `IRIS_IMAGE_DIR` at the
-dataset the notebooks build.
+labelled — 6 questions). For the real thing, build the first 250 ChartQAPro
+factoid questions locally (CPU only, downloads from the HF Hub, same
+`factoid-%05d` ids as the notebooks so stored runs line up):
+
+```bash
+.venv/bin/pip install datasets pillow
+.venv/bin/python scripts/build_chartqapro_dataset.py --n 250 --out data/chartqapro
+
+IRIS_DATASET_JSON=$PWD/data/chartqapro/dataset.json \
+IRIS_IMAGE_DIR=$PWD/data/chartqapro/images \
+make backend
+```
+
+For replay, drop the Kaggle run outputs (`decomp_alg2.json` + `.csv`,
+optionally `decomp_alg1.*`) into a folder and point `IRIS_RESULTS_DIR` at it
+— the JSON is preferred, as only it carries the full RoSE paths.
 
 ## Quick start — GPU host (live runs)
 
@@ -166,12 +177,15 @@ a hostname other than localhost, 127.0.0.1 or huggingface.co.
 
 ### Free hosting paths
 
-**(a) Live demo on a free GPU session** — run the backend in a Kaggle (T4 ×2)
-or Colab session: install the pinned stack, start `uvicorn` in live mode,
-and expose port 8000 through a free tunnel
-(`cloudflared tunnel --url http://localhost:8000`, or `ngrok http 8000`).
-Point the frontend's `IRIS_API_URL` at the tunnel URL. Sessions are
-time-boxed; the experience pool reseeds from `IRIS_POOL_PATH` each start.
+**(a) Live demo on a free GPU session** — ready-made:
+`Notebook/iris_backend_cloud.ipynb` runs on a free Kaggle (T4 ×2) or Colab
+GPU session. It clones this branch, installs the pinned stack, verifies
+gated HF access, builds the 250-question dataset, starts the backend in
+live mode and opens a free cloudflared quick tunnel, printing the URL. On
+your laptop, run only the frontend:
+`cd iris-frontend && IRIS_API_URL=https://<printed>.trycloudflare.com npm run dev`.
+Sessions are time-boxed; the experience pool reseeds from `IRIS_POOL_PATH`
+each start, and the tunnel URL changes per session.
 
 **(b) Permanent demo-mode deployment (replay only, no GPU)** — the frontend
 builds statically and deploys on Vercel's free tier (set `IRIS_API_URL` at
