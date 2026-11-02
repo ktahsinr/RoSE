@@ -334,5 +334,173 @@
     "params_b_used": 16.6,
     "latency_s": 118.2,
     "model_key": "qwen2.5-vl-7b"
+  },
+  {
+    "id": "figureqa-000000",
+    "question": "Is Dark Red the maximum?",
+    "question_type": "factoid",
+    "choices": null,
+    "options_shown": null,
+    "option_perms": null,
+    "ground_truth": "Yes",
+    "prediction": "Yes",
+    "prediction_norm": "yes",
+    "is_correct": true,
+    "method": "rose_few_shot",
+    "uncertainty": 0.45,
+    "complexity": 2.0,
+    "agreement": 1.0,
+    "vote_mode": "exact",
+    "n_groups": 1,
+    "paths_voting": 3,
+    "n_demos": 3,
+    "pool_size": 6,
+    "chart_description": "A vertical bar chart titled \u201cFigureQA-style bars (sample data)\u201d with 4 bars (Dark Red, Sky Blue, Olive, Coral), y-axis in value. The tallest bar is Dark Red (72) and the shortest is Coral (31).",
+    "best_rationale": "Step 1: What are the values shown for Dark Red and Coral? The chart shows the plotted values.\nStep 2: Using those values, is Dark Red the maximum? Comparing them gives the result.\nFinal Answer: Yes",
+    "raw_outputs": [
+      "Step 1: What are the values shown for Dark Red and Coral? The chart shows the plotted values.\nStep 2: Using those values, is Dark Red the maximum? Comparing them gives the result.\nFinal Answer: Yes",
+      "Step 1: What are the values shown for Dark Red and Coral? The chart shows the plotted values.\nStep 2: Using those values, is Dark Red the maximum? Comparing them gives the result.\nFinal Answer: Yes",
+      "Step 1: What are the values shown for Dark Red and Coral? The chart shows the plotted values.\nStep 2: Using those values, is Dark Red the maximum? Reading off and comparing them gives the result.\nFinal Answer: Yes"
+    ],
+    "extracted": [
+      "Yes",
+      "Yes",
+      "Yes"
+    ],
+    "normalized": [
+      "yes",
+      "yes",
+      "yes"
+    ],
+    "algorithm": 2,
+    "sub_queries": [
+      "What are the values shown for Dark Red and Coral?",
+      "Using those values, is Dark Red the maximum?"
+    ],
+    "sub_answers": [],
+    "sub_confidences": [],
+    "sub_models": [],
+    "decomp_fallback": {
+      "gemma3-4b": false,
+      "qwen3.5-4b": false
+    },
+    "vote_rule": "merge",
+    "proposals": {
+      "gemma3-4b": [
+        "What are the values shown for Dark Red and Coral?",
+        "Using those values, is Dark Red the maximum?"
+      ],
+      "qwen3.5-4b": [
+        "Which are the values shown for Dark Red and Coral?",
+        "Using those values, is Dark Red the maximum?"
+      ]
+    },
+    "vote": {
+      "rule": "merge",
+      "picked_model": null,
+      "matching": "straight",
+      "pair_sims": [
+        0.91,
+        0.87
+      ],
+      "mean_sim_to_question": {
+        "gemma3-4b": 0.74,
+        "qwen3.5-4b": 0.69
+      },
+      "threshold": 0.8
+    },
+    "stage_latency_s": {
+      "decompose_gemma3-4b": 9.4,
+      "decompose_qwen3.5-4b": 12.1,
+      "choose": 0.2,
+      "rose_final": 96.5
+    },
+    "params_b_used": 16.6,
+    "latency_s": 118.2,
+    "model_key": "qwen2.5-vl-7b"
+  },
+  {
+    "id": "plotqa-000000",
+    "question": "What is the value of Brazil in 2010?",
+    "question_type": "factoid",
+    "choices": null,
+    "options_shown": null,
+    "option_perms": null,
+    "ground_truth": "37",
+    "prediction": "37",
+    "prediction_norm": "37",
+    "is_correct": true,
+    "method": "rose_few_shot",
+    "uncertainty": 0.5,
+    "complexity": 2.0,
+    "agreement": 0.6667,
+    "vote_mode": "exact",
+    "n_groups": 1,
+    "paths_voting": 3,
+    "n_demos": 3,
+    "pool_size": 7,
+    "chart_description": "A vertical bar chart titled \u201cPlotQA-style series (sample data)\u201d with 4 bars (2000, 2005, 2010, 2015), y-axis in index. The tallest bar is 2010 (37) and the shortest is 2000 (14).",
+    "best_rationale": "Step 1: What are the values shown for 2000 and 2015? The chart shows the plotted values.\nStep 2: Using those values, what is the value of Brazil in 2010? Comparing them gives the result.\nFinal Answer: 37",
+    "raw_outputs": [
+      "Step 1: What are the values shown for 2000 and 2015? The chart shows the plotted values.\nStep 2: Using those values, what is the value of Brazil in 2010? Comparing them gives the result.\nFinal Answer: 37",
+      "Step 1: What are the values shown for 2000 and 2015? The chart shows the plotted values.\nStep 2: Using those values, what is the value of Brazil in 2010? Comparing them gives the result.\nFinal Answer: 37",
+      "Step 1: What are the values shown for 2000 and 2015? The chart shows the plotted values.\nStep 2: Using those values, what is the value of Brazil in 2010? Reading off and comparing them gives the result.\nFinal Answer: 37"
+    ],
+    "extracted": [
+      "37",
+      "37",
+      "37"
+    ],
+    "normalized": [
+      "37",
+      "37",
+      "37"
+    ],
+    "algorithm": 2,
+    "sub_queries": [
+      "What are the values shown for 2000 and 2015?",
+      "Using those values, what is the value of Brazil in 2010?"
+    ],
+    "sub_answers": [],
+    "sub_confidences": [],
+    "sub_models": [],
+    "decomp_fallback": {
+      "gemma3-4b": false,
+      "qwen3.5-4b": false
+    },
+    "vote_rule": "pick:gemma3-4b",
+    "proposals": {
+      "gemma3-4b": [
+        "What are the values shown for 2000 and 2015?",
+        "Using those values, what is the value of Brazil in 2010?"
+      ],
+      "qwen3.5-4b": [
+        "Which are the values shown for 2000 and 2015?",
+        "Using those values, what is the value of Brazil in 2010?"
+      ]
+    },
+    "vote": {
+      "rule": "pick",
+      "picked_model": "gemma3-4b",
+      "matching": "straight",
+      "pair_sims": [
+        0.62,
+        0.55
+      ],
+      "mean_sim_to_question": {
+        "gemma3-4b": 0.74,
+        "qwen3.5-4b": 0.69
+      },
+      "threshold": 0.8
+    },
+    "stage_latency_s": {
+      "decompose_gemma3-4b": 9.4,
+      "decompose_qwen3.5-4b": 12.1,
+      "choose": 0.2,
+      "rose_final": 96.5
+    },
+    "params_b_used": 16.6,
+    "latency_s": 118.2,
+    "model_key": "qwen2.5-vl-7b"
   }
 ]

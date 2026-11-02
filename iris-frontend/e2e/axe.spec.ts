@@ -5,7 +5,7 @@ import { test, expect, type Page } from "@playwright/test";
  *  WCAG 2.2 AA is the gate here; text contrast is designed to AAA and the
  *  token pairs are verified numerically in the design (see globals.css). */
 
-const PAGES = ["/", "/explorer", "/pdf", "/benchmarks", "/about"];
+const PAGES = ["/", "/explorer", "/figureqa", "/plotqa", "/pdf", "/benchmarks", "/about"];
 const THEMES = ["light", "dark", "hc"] as const;
 
 async function analyze(page: Page) {

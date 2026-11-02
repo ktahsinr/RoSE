@@ -33,6 +33,16 @@ def unwrap_question(q) -> str:
     return s
 
 
+def dataset_of(question_id: str) -> str:
+    """Dataset name from the id prefix the builders use.
+
+    figureqa-000123 → figureqa, plotqa-000045 → plotqa; everything else
+    (factoid-00000, mcq-…) is ChartQAPro.
+    """
+    prefix = question_id.split("-", 1)[0].lower()
+    return prefix if prefix in ("figureqa", "plotqa") else "chartqapro"
+
+
 def load_dataset(path: Path) -> list:
     """Load a dataset JSON (the notebooks' record shape) into API records.
 
@@ -44,8 +54,10 @@ def load_dataset(path: Path) -> list:
     records = []
     for row in rows:
         image = str(row.get("image", "") or "")
+        qid = str(row.get("id", ""))
         records.append({
-            "id": str(row.get("id", "")),
+            "id": qid,
+            "dataset": dataset_of(qid),
             "question": unwrap_question(row.get("question", "")),
             "question_type": str(row.get("question_type", "factoid")).lower(),
             "choices": row.get("choices"),

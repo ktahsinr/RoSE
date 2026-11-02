@@ -142,9 +142,13 @@ class LiveEngine:
             rec = self.by_id.get(request["question_id"])
             if rec is None:
                 raise ValueError(f"no question {request['question_id']!r}")
-            if not self.settings.image_dir:
+            if not self.settings.image_dirs:
                 raise ValueError("IRIS_IMAGE_DIR is not configured")
-            return Path(self.settings.image_dir) / rec["image_name"]
+            for image_dir in self.settings.image_dirs:
+                candidate = Path(image_dir) / rec["image_name"]
+                if candidate.exists():
+                    return candidate
+            return Path(self.settings.image_dirs[0]) / rec["image_name"]
         path = Path(self.settings.upload_dir) / f"{request['image_id']}.png"
         if not path.exists():
             raise ValueError(f"no uploaded image {request['image_id']!r}")

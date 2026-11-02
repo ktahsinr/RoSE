@@ -18,8 +18,8 @@ def sample(tmp_path_factory):
 @pytest.fixture()
 def demo_settings(sample, tmp_path):
     return Settings(
-        dataset_json=sample["dataset_json"],
-        image_dir=sample["image_dir"],
+        dataset_jsons=[sample["dataset_json"]],
+        image_dirs=[sample["image_dir"]],
         results_dir=sample["results_dir"],
         pool_path=None, pool_stream=False, demo_mode=True,
         upload_dir=tmp_path / "uploads",

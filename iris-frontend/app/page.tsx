@@ -50,6 +50,18 @@ export default function Home() {
             Explore ChartQAPro questions
           </Link>
           <Link
+            href="/figureqa"
+            className="rounded-lg border-2 border-accent bg-accent-soft px-4 py-2 font-bold text-accent"
+          >
+            Explore FigureQA questions
+          </Link>
+          <Link
+            href="/plotqa"
+            className="rounded-lg border-2 border-accent bg-accent-soft px-4 py-2 font-bold text-accent"
+          >
+            Explore PlotQA questions
+          </Link>
+          <Link
             href="/pdf"
             className="rounded-lg border-2 border-accent bg-accent-soft px-4 py-2 font-bold text-accent"
           >
@@ -110,7 +122,9 @@ export default function Home() {
         <p>
           IRIS is built on the <strong>RoSE</strong> reasoning framework
           (Liu, He &amp; Qiu, EMNLP 2024) and evaluated on the{" "}
-          <strong>ChartQAPro</strong> benchmark (Masry et al., 2025).
+          <strong>ChartQAPro</strong> benchmark (Masry et al., 2025), with{" "}
+          <strong>FigureQA</strong> and <strong>PlotQA</strong> sections for
+          cross-dataset exploration.
           Developed as a North South University CSE499B capstone, supervised
           by Dr. Md Adnan Arefeen.{" "}
           <Link href="/about" className="font-semibold text-accent underline">

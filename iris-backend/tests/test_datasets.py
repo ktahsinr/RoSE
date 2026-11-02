@@ -27,7 +27,13 @@ def test_plain_strings_and_longer_lists_unchanged():
 
 def test_loader_applies_unwrap_and_basename(tmp_path, sample):
     records = load_dataset(sample["dataset_json"])
-    assert len(records) == 6
+    assert len(records) == 12
+    by_dataset = {}
+    for r in records:
+        by_dataset.setdefault(r["dataset"], []).append(r["id"])
+    assert len(by_dataset["chartqapro"]) == 6
+    assert len(by_dataset["figureqa"]) == 3
+    assert len(by_dataset["plotqa"]) == 3
     for r in records:
         q = r["question"]
         assert not (q.startswith("['") or q.startswith('["')), q

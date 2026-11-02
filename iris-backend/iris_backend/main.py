@@ -84,8 +84,12 @@ def create_app(settings: "Settings | None" = None) -> FastAPI:
             "pool_size": (s.engine.pool.size()
                           if s.engine and s.engine.pool else None),
             "pool_stream": s.settings.pool_stream,
-            "dataset": {"path": str(s.settings.dataset_json or ""),
+            "dataset": {"path": ",".join(str(p) for p in s.settings.dataset_jsons),
                         "count": len(s.records)},
+            "datasets": {name: sum(1 for r in s.records
+                                   if r["dataset"] == name)
+                         for name in dict.fromkeys(
+                             r["dataset"] for r in s.records)},
             "replay_algorithms": s.replay.algorithms(),
             "queue_length": s.queue.qsize(),
         }
@@ -114,6 +118,7 @@ def create_app(settings: "Settings | None" = None) -> FastAPI:
     def _question_payload(s: AppState, r: dict) -> dict:
         return {
             "id": r["id"],
+            "dataset": r["dataset"],
             "question": r["question"],
             "question_type": r["question_type"],
             "ground_truth": r["ground_truth"],
@@ -123,9 +128,12 @@ def create_app(settings: "Settings | None" = None) -> FastAPI:
 
     @app.get("/questions")
     def questions(request: Request, offset: int = 0, limit: int = 50,
-                  type: Optional[str] = None, search: Optional[str] = None):
+                  type: Optional[str] = None, search: Optional[str] = None,
+                  dataset: Optional[str] = None):
         s = st(request)
         rows = s.records
+        if dataset:
+            rows = [r for r in rows if r["dataset"] == dataset.lower()]
         if type:
             rows = [r for r in rows if r["question_type"] == type.lower()]
         if search:
@@ -151,12 +159,13 @@ def create_app(settings: "Settings | None" = None) -> FastAPI:
     @app.get("/images/{name}")
     def image(request: Request, name: str):
         s = st(request)
-        if s.settings.image_dir is None or "/" in name or name.startswith("."):
+        if not s.settings.image_dirs or "/" in name or name.startswith("."):
             raise HTTPException(404, "image not found")
-        path = s.settings.image_dir / name
-        if not path.is_file():
-            raise HTTPException(404, "image not found")
-        return FileResponse(path)
+        for image_dir in s.settings.image_dirs:
+            path = image_dir / name
+            if path.is_file():
+                return FileResponse(path)
+        raise HTTPException(404, "image not found")
 
     @app.get("/uploads/{image_id}")
     def upload_image(request: Request, image_id: str):

@@ -80,18 +80,24 @@ make frontend    # Next.js on :3000
 ```
 
 The defaults point at `iris-backend/sample_data/` (synthetic, clearly
-labelled — 6 questions). For the real thing, build the first 250 ChartQAPro
-factoid questions locally (CPU only, downloads from the HF Hub, same
-`factoid-%05d` ids as the notebooks so stored runs line up):
+labelled — 6 ChartQAPro + 3 FigureQA + 3 PlotQA questions). For the real
+thing, build the datasets locally (CPU only, downloads from the HF Hub,
+same ids as the notebooks — `factoid-%05d`, `figureqa-%06d`,
+`plotqa-%06d` — so stored runs line up):
 
 ```bash
 .venv/bin/pip install datasets pillow
 .venv/bin/python scripts/build_chartqapro_dataset.py --n 250 --out data/chartqapro
+.venv/bin/python scripts/build_cauldron_dataset.py figureqa --n 100 --out data/figureqa
+.venv/bin/python scripts/build_cauldron_dataset.py plotqa   --n 100 --out data/plotqa
+# or: make datasets
 
-IRIS_DATASET_JSON=$PWD/data/chartqapro/dataset.json \
-IRIS_IMAGE_DIR=$PWD/data/chartqapro/images \
-make backend
+make backend-data   # serves all datasets found under data/
 ```
+
+`IRIS_DATASET_JSON` and `IRIS_IMAGE_DIR` take comma-separated lists, one
+entry per dataset — the frontend's ChartQAPro, FigureQA and PlotQA sections
+each show their own dataset's questions (the id prefix decides the dataset).
 
 For replay, drop the Kaggle run outputs (`decomp_alg2.json` + `.csv`,
 optionally `decomp_alg1.*`) into a folder and point `IRIS_RESULTS_DIR` at it
@@ -124,8 +130,8 @@ answers few-shot. The pool is read-only during runs unless
 
 | Variable | Meaning | Default |
 |---|---|---|
-| `IRIS_DATASET_JSON` | dataset JSON (notebook record shape) | sample data via Makefile |
-| `IRIS_IMAGE_DIR` | chart images, served at `/images/<name>` | sample data via Makefile |
+| `IRIS_DATASET_JSON` | dataset JSON(s), comma-separated (notebook record shape) | sample data via Makefile |
+| `IRIS_IMAGE_DIR` | chart image dir(s), comma-separated, served at `/images/<name>` | sample data via Makefile |
 | `IRIS_RESULTS_DIR` | stored run files for replay (`decomp_alg2.json`/`.csv`, `decomp_alg1.*`) | `chartqapro/results/decompose` |
 | `IRIS_POOL_PATH` | results JSON that seeds the 7B experience pool | unset → empty pool |
 | `IRIS_POOL_STREAM` | let live runs grow the pool | `false` |

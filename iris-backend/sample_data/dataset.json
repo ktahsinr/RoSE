@@ -48,5 +48,53 @@
     "answer": "50",
     "question_type": "factoid",
     "image": "/kaggle/temp/images/00005.png"
+  },
+  {
+    "id": "figureqa-000000",
+    "question": "Is Dark Red the maximum?",
+    "choices": null,
+    "answer": "Yes",
+    "question_type": "factoid",
+    "image": "/kaggle/temp/images/figureqa_000000.png"
+  },
+  {
+    "id": "figureqa-000001",
+    "question": "Does Medium Purple have the lowest value?",
+    "choices": null,
+    "answer": "No",
+    "question_type": "factoid",
+    "image": "/kaggle/temp/images/figureqa_000001.png"
+  },
+  {
+    "id": "figureqa-000002",
+    "question": "Is Forest Green greater than Tomato?",
+    "choices": null,
+    "answer": "Yes",
+    "question_type": "factoid",
+    "image": "/kaggle/temp/images/figureqa_000002.png"
+  },
+  {
+    "id": "plotqa-000000",
+    "question": "What is the value of Brazil in 2010?",
+    "choices": null,
+    "answer": "37",
+    "question_type": "factoid",
+    "image": "/kaggle/temp/images/plotqa_000000.png"
+  },
+  {
+    "id": "plotqa-000001",
+    "question": "In which year does the plot peak?",
+    "choices": null,
+    "answer": "2000",
+    "question_type": "factoid",
+    "image": "/kaggle/temp/images/plotqa_000001.png"
+  },
+  {
+    "id": "plotqa-000002",
+    "question": "What is the difference between the highest and lowest values?",
+    "choices": null,
+    "answer": "30",
+    "question_type": "factoid",
+    "image": "/kaggle/temp/images/plotqa_000002.png"
   }
 ]

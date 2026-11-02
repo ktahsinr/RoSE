@@ -65,6 +65,7 @@ export interface Health {
   models_loaded: string[];
   pool_size: number | null;
   dataset: { path: string; count: number };
+  datasets?: Record<string, number>;
   replay_algorithms: number[];
   queue_length: number;
 }
@@ -82,6 +83,7 @@ export interface ModelInfo {
 
 export interface QuestionItem {
   id: string;
+  dataset: string;
   question: string;
   question_type: string;
   ground_truth: string | string[];

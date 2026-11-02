@@ -5,7 +5,8 @@ def test_health_reports_demo_mode(client):
     h = client.get("/health").json()
     assert h["mode"] == "demo" and h["live_runs_enabled"] is False
     assert h["models_loaded"] == []
-    assert h["dataset"]["count"] == 6
+    assert h["dataset"]["count"] == 12
+    assert h["datasets"] == {"chartqapro": 6, "figureqa": 3, "plotqa": 3}
     assert h["replay_algorithms"] == [2]
 
 
@@ -22,10 +23,10 @@ def test_models_lists_registry_unloaded(client):
 
 def test_questions_list_filter_search(client):
     out = client.get("/questions").json()
-    assert out["total"] == 6 and len(out["items"]) == 6
+    assert out["total"] == 12 and len(out["items"]) == 12
     item = out["items"][0]
-    assert set(item) >= {"id", "question", "question_type", "ground_truth",
-                         "image_url", "has_replay"}
+    assert set(item) >= {"id", "dataset", "question", "question_type",
+                         "ground_truth", "image_url", "has_replay"}
     assert item["has_replay"]["alg2"] is True        # first 4 have replays
     assert out["items"][5]["has_replay"]["alg2"] is False
 
@@ -34,7 +35,22 @@ def test_questions_list_filter_search(client):
     assert "unemployment" in out["items"][0]["question"]
 
     out = client.get("/questions", params={"offset": 4, "limit": 1}).json()
-    assert len(out["items"]) == 1 and out["total"] == 6
+    assert len(out["items"]) == 1 and out["total"] == 12
+
+
+def test_questions_dataset_filter(client):
+    for name, count in (("chartqapro", 6), ("figureqa", 3), ("plotqa", 3)):
+        out = client.get("/questions", params={"dataset": name}).json()
+        assert out["total"] == count, name
+        assert all(i["dataset"] == name for i in out["items"])
+    # The first FigureQA and PlotQA questions carry a stored result.
+    fq = client.get("/questions", params={"dataset": "figureqa"}).json()
+    assert fq["items"][0]["has_replay"]["alg2"] is True
+    assert fq["items"][1]["has_replay"]["alg2"] is False
+    pq = client.get("/questions/plotqa-000000").json()
+    assert pq["replay"]["alg2"]["final_answer"] == "37"
+    img = client.get(fq["items"][0]["image_url"])
+    assert img.status_code == 200
 
 
 def test_question_detail_carries_full_replay(client):

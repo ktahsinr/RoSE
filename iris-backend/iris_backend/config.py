@@ -1,4 +1,8 @@
-"""Every IRIS_* environment variable, read once into a Settings object."""
+"""Every IRIS_* environment variable, read once into a Settings object.
+
+IRIS_DATASET_JSON and IRIS_IMAGE_DIR accept comma-separated lists, one
+entry per dataset (ChartQAPro, FigureQA, PlotQA …), served together.
+"""
 
 import os
 import tempfile
@@ -23,10 +27,17 @@ def _cuda_available() -> bool:
         return False
 
 
+def _paths(value: "str | None") -> list:
+    """Comma-separated env value → list of Paths (order preserved)."""
+    if not value:
+        return []
+    return [Path(p.strip()) for p in value.split(",") if p.strip()]
+
+
 @dataclass
 class Settings:
-    dataset_json: "Path | None"
-    image_dir: "Path | None"
+    dataset_jsons: list        # one dataset.json per dataset, in serve order
+    image_dirs: list           # searched in order by /images/{name}
     results_dir: Path
     pool_path: "Path | None"
     pool_stream: bool
@@ -55,8 +66,8 @@ class Settings:
             "http://localhost:3000,http://127.0.0.1:3000").split(",") if o.strip()]
 
         s = cls(
-            dataset_json=Path(dataset) if dataset else None,
-            image_dir=Path(images) if images else None,
+            dataset_jsons=_paths(dataset),
+            image_dirs=_paths(images),
             results_dir=Path(results),
             pool_path=Path(pool) if pool else None,
             pool_stream=_bool("IRIS_POOL_STREAM", False),

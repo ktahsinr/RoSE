@@ -8,7 +8,9 @@ import { useAnnounce } from "@/lib/announcer";
 
 const NAV = [
   { href: "/", label: "Home" },
-  { href: "/explorer", label: "Explorer" },
+  { href: "/explorer", label: "ChartQAPro" },
+  { href: "/figureqa", label: "FigureQA" },
+  { href: "/plotqa", label: "PlotQA" },
   { href: "/pdf", label: "PDF chart QA" },
   { href: "/benchmarks", label: "Benchmarks" },
   { href: "/about", label: "About" },

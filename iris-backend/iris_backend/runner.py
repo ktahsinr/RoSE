@@ -27,14 +27,15 @@ class AppState:
         self.engine = None           # LiveEngine when not in demo mode
         self.started_at = time.time()
 
-        if settings.dataset_json and settings.dataset_json.exists():
-            self.records = load_dataset(settings.dataset_json)
-            self.by_id = {r["id"]: r for r in self.records}
-        elif settings.dataset_json:
-            print(f"⚠  IRIS_DATASET_JSON not found: {settings.dataset_json} "
-                  "— serving 0 questions. Check the path (it must be "
-                  "absolute or relative to the server's working directory).")
-        else:
+        for path in settings.dataset_jsons:
+            if path.exists():
+                self.records.extend(load_dataset(path))
+            else:
+                print(f"⚠  IRIS_DATASET_JSON entry not found: {path} — "
+                      "skipping it. Check the path (it must be absolute or "
+                      "relative to the server's working directory).")
+        self.by_id = {r["id"]: r for r in self.records}
+        if not settings.dataset_jsons:
             print("⚠  IRIS_DATASET_JSON is not set — serving 0 questions.")
         if not self.replay.runs:
             print(f"ℹ  no stored run files in {settings.results_dir} — "

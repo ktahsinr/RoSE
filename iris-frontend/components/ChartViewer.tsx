@@ -14,10 +14,13 @@ export default function ChartViewer({
   src,
   description,
   title,
+  footer,
 }: {
   src: string | null;
   description: string;
   title: string;
+  /** Rendered directly under the chart image (e.g. the selected question). */
+  footer?: React.ReactNode;
 }) {
   const [zoomIdx, setZoomIdx] = useState(0);
   const [inverted, setInverted] = useState(false);
@@ -160,6 +163,8 @@ export default function ChartViewer({
           <p className="p-6 text-muted">No chart selected yet.</p>
         )}
       </div>
+
+      {footer}
 
       <div className="rounded-lg border-2 border-line bg-surface p-3">
         <div className="mb-1 flex flex-wrap items-center justify-between gap-2">

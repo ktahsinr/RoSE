@@ -52,8 +52,8 @@ def live_client(sample, tmp_path, monkeypatch):
     monkeypatch.setattr(LiveEngine, "load", fake_load)
 
     settings = Settings(
-        dataset_json=sample["dataset_json"],
-        image_dir=sample["image_dir"],
+        dataset_jsons=[sample["dataset_json"]],
+        image_dirs=[sample["image_dir"]],
         results_dir=sample["results_dir"],
         pool_path=sample["results_dir"] / "decomp_alg2.json",
         pool_stream=False, demo_mode=False,
@@ -81,7 +81,7 @@ def _wait_finished(client, run_id, timeout=15.0):
 def test_live_run_streams_every_stage(live_client):
     h = live_client.get("/health").json()
     assert h["mode"] == "live" and h["live_runs_enabled"] is True
-    assert h["pool_size"] == 4            # seeded from the sample results JSON
+    assert h["pool_size"] == 6            # seeded from the sample results JSON
 
     r = live_client.post("/run", json={"question_id": "factoid-00000",
                                        "fast_mode": True})
@@ -112,7 +112,7 @@ def test_live_run_streams_every_stage(live_client):
     assert all("announce" in e["data"] for e in snap["events"])
 
     # Read-only pool: the run must not have grown it.
-    assert live_client.get("/health").json()["pool_size"] == 4
+    assert live_client.get("/health").json()["pool_size"] == 6
 
 
 def test_live_run_single_planner_and_sse_stream(live_client):

@@ -25,7 +25,26 @@ import QuestionPicker from "@/components/QuestionPicker";
 import RunStatus from "@/components/RunStatus";
 import Trace from "@/components/Trace";
 
-export default function Explorer() {
+export interface DatasetSection {
+  /** Backend dataset key: the `dataset` query param on /questions. */
+  key: "chartqapro" | "figureqa" | "plotqa";
+  title: string;
+  intro: string;
+}
+
+export const CHARTQAPRO_SECTION: DatasetSection = {
+  key: "chartqapro",
+  title: "ChartQAPro Explorer",
+  intro:
+    "Real-world charts from the ChartQAPro benchmark (Masry et al., 2025) " +
+    "with human-written questions.",
+};
+
+export default function Explorer({
+  section = CHARTQAPRO_SECTION,
+}: {
+  section?: DatasetSection;
+}) {
   const announce = useAnnounce();
   const { trace, setTrace, running, startedAt, setStartedAt, start, stop } =
     useLiveRun();
@@ -61,7 +80,11 @@ export default function Explorer() {
   // ── question list (debounced search) ──────────────────────
   useEffect(() => {
     const t = setTimeout(() => {
-      const params = new URLSearchParams({ limit: "100" });
+      // 100 questions per dataset section.
+      const params = new URLSearchParams({
+        limit: "100",
+        dataset: section.key,
+      });
       if (search) params.set("search", search);
       if (typeFilter) params.set("type", typeFilter);
       getJSON<{ total: number; items: QuestionItem[] }>(
@@ -74,7 +97,7 @@ export default function Explorer() {
         .catch((e: ApiError) => setLoadError(e.message));
     }, 250);
     return () => clearTimeout(t);
-  }, [search, typeFilter]);
+  }, [search, typeFilter, section.key]);
 
   // ── selection ─────────────────────────────────────────────
   const selectQuestion = useCallback(
@@ -113,7 +136,8 @@ export default function Explorer() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">ChartQAPro Explorer</h1>
+      <h1 className="text-2xl font-bold">{section.title}</h1>
+      <p className="text-muted">{section.intro}</p>
 
       {loadError && (
         <p
@@ -148,6 +172,29 @@ export default function Explorer() {
             description={description}
             title={
               detail ? `Chart for question ${detail.id}` : "No chart selected"
+            }
+            footer={
+              detail && (
+                /* The selected (and, once run, answered) question stays
+                   pinned under the chart so both read together. */
+                <section
+                  aria-label="Selected question"
+                  className="rounded-lg border-2 border-accent bg-accent-soft p-3"
+                >
+                  <h3 className="font-bold text-accent">
+                    {running
+                      ? "Question — running now"
+                      : trace.final
+                        ? "Question — answered above"
+                        : "Selected question"}
+                  </h3>
+                  <p className="font-semibold">{detail.question}</p>
+                  <p className="text-sm text-muted">
+                    {detail.id} · {detail.question_type}
+                    {!running && !trace.final && " · not run yet"}
+                  </p>
+                </section>
+              )
             }
           />
         </div>

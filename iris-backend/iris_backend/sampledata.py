@@ -34,6 +34,33 @@ CHARTS = [
      {"Cars": 50, "Trucks": 25, "Bikes": 15, "Buses": 10}, "%", "50"),
 ]
 
+# Demo rows for the FigureQA and PlotQA sections. Ids and image names follow
+# the Kaggle builders' conventions (figureqa-NNNNNN ↔ figureqa_NNNNNN.png),
+# so the backend's id-prefix dataset routing sees them as those datasets.
+# FigureQA is yes/no over synthetic figures; PlotQA is short factoids.
+FIGUREQA_CHARTS = [
+    ("figureqa-000000", "Is Dark Red the maximum?",
+     "FigureQA-style bars (sample data)",
+     {"Dark Red": 72, "Sky Blue": 45, "Olive": 58, "Coral": 31}, "value", "Yes"),
+    ("figureqa-000001", "Does Medium Purple have the lowest value?",
+     "FigureQA-style bars (sample data)",
+     {"Medium Purple": 44, "Teal": 29, "Gold": 63, "Slate": 51}, "value", "No"),
+    ("figureqa-000002", "Is Forest Green greater than Tomato?",
+     "FigureQA-style bars (sample data)",
+     {"Forest Green": 66, "Tomato": 39, "Navy": 52, "Khaki": 24}, "value", "Yes"),
+]
+PLOTQA_CHARTS = [
+    ("plotqa-000000", "What is the value of Brazil in 2010?",
+     "PlotQA-style series (sample data)",
+     {"2000": 14, "2005": 22, "2010": 37, "2015": 29}, "index", "37"),
+    ("plotqa-000001", "In which year does the plot peak?",
+     "PlotQA-style series (sample data)",
+     {"1990": 8, "1995": 19, "2000": 26, "2005": 17}, "rate", "2000"),
+    ("plotqa-000002", "What is the difference between the highest and lowest values?",
+     "PlotQA-style series (sample data)",
+     {"Q1": 40, "Q2": 55, "Q3": 25, "Q4": 45}, "units", "30"),
+]
+
 
 def _draw_chart(path: Path, title: str, data: dict, unit: str):
     w, h = 640, 420
@@ -60,7 +87,7 @@ def _sub_queries(question: str, data: dict) -> list:
             f"Using those values, {question[0].lower() + question[1:]}"]
 
 
-def _alg2_row(i: int, rec: dict, data: dict) -> dict:
+def _alg2_row(i: int, rec: dict, data: dict, title: str, unit: str) -> dict:
     """One stored result in decomp_runner's JSON row shape."""
     q = rec["question"]
     subs = _sub_queries(q, data)
@@ -87,8 +114,8 @@ def _alg2_row(i: int, rec: dict, data: dict) -> dict:
         "n_demos": 0 if i < 3 else 3,
         "pool_size": i,
         "chart_description": (
-            f"A vertical bar chart titled “{CHARTS[i][2]}” with "
-            f"{len(data)} bars ({', '.join(data)}), y-axis in {CHARTS[i][4]}. "
+            f"A vertical bar chart titled “{title}” with "
+            f"{len(data)} bars ({', '.join(data)}), y-axis in {unit}. "
             f"The tallest bar is {max(data, key=data.get)} "
             f"({max(data.values())}) and the shortest is "
             f"{min(data, key=data.get)} ({min(data.values())})."),
@@ -134,17 +161,31 @@ def make_sample_data(dest: Path) -> dict:
                         "choices": None, "answer": gold,
                         "question_type": "factoid",
                         "image": f"/kaggle/temp/images/{name}"})
+    extra = list(FIGUREQA_CHARTS) + list(PLOTQA_CHARTS)
+    for qid, question, title, data, unit, gold in extra:
+        name = f"{qid.replace('-', '_')}.png"
+        _draw_chart(images / name, title, data, unit)
+        records.append({"id": qid, "question": question,
+                        "choices": None, "answer": gold,
+                        "question_type": "factoid",
+                        "image": f"/kaggle/temp/images/{name}"})
     (dest / "dataset.json").write_text(
         json.dumps(records, ensure_ascii=False, indent=2))
 
-    # Stored alg2 results for the first 4 questions only, so the frontend
-    # also exercises the "no stored result" state.
+    # Stored alg2 results for the first 4 ChartQAPro questions only, so the
+    # frontend also exercises the "no stored result" state — plus the first
+    # FigureQA and PlotQA question each, so those sections replay in demo.
     rows = []
     for i, rec in enumerate(records[:4]):
         rec_unwrapped = dict(rec, question=(
             rec["question"][0] if isinstance(rec["question"], list)
             else rec["question"]))
-        rows.append(_alg2_row(i, rec_unwrapped, CHARTS[i][3]))
+        rows.append(_alg2_row(i, rec_unwrapped, CHARTS[i][3],
+                              CHARTS[i][2], CHARTS[i][4]))
+    for i, chart in enumerate([FIGUREQA_CHARTS[0], PLOTQA_CHARTS[0]]):
+        qid, question, title, data, unit, gold = chart
+        rec = {"id": qid, "question": question, "answer": gold}
+        rows.append(_alg2_row(len(CHARTS) + i, rec, data, title, unit))
     (results / "decomp_alg2.json").write_text(json.dumps(rows, indent=2))
     (results / "decomp_alg2_meta.json").write_text(json.dumps({
         "algorithm": 2, "n": len(rows), "n_total": len(records),
